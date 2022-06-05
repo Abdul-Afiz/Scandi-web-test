@@ -23,6 +23,27 @@ const ItemsWrapper = styled.div`
     display: flex;
     column-gap: 8px;
   }
+  .item-quantity {
+    display: flex;
+    & > div {
+      display: flex;
+    }
+
+    & > div:nth-of-type(1) {
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    & > div:nth-of-type(2) {
+      width: 100%;
+
+      & > img {
+        max-width: 100%;
+        object-fit: cover;
+      }
+    }
+  }
 `;
 
 const cartItems = [

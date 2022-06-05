@@ -15,6 +15,7 @@ const Nav = styled.nav`
   .cart-drawer{
     position: absolute;
     content: '';
+    max-width: 325px;
     top: 5rem;
     right: 0;
     & > div{
