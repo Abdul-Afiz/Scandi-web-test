@@ -4,17 +4,17 @@ import styled from "styled-components";
 export const StyledSvg = styled.svg`
   margin-right: ${({ mr }) => `${mr}px`};
   margin-left: ${({ ml }) => `${ml}px`};
-  margin-up: ${({ mt }) => `${mt}px`};
-  margin-down: ${({ mb }) => `${mb}px`};
+  margin-top: ${({ mt }) => `${mt}px`};
+  margin-bottom: ${({ mb }) => `${mb}px`};
   padding-right: ${({ pr }) => `${pr}px`};
   padding-left: ${({ pl }) => `${pl}px`};
-  padding-up: ${({ pt }) => `${pt}px`};
-  padding-down: ${({ pb }) => `${pb}px`};
+  padding-top: ${({ pt }) => `${pt}px`};
+  padding-bottom: ${({ pb }) => `${pb}px`};
 `;
 
 class CartIcon extends Component {
   render() {
-    const { mr, ml, mt, mb, pr, pl, pt, pb } = this.props;
+    const { mr, ml, mt, mb, pr, pl, pt, pb, onClick } = this.props;
     return (
       <StyledSvg
         mr={mr}
@@ -25,6 +25,7 @@ class CartIcon extends Component {
         pl={pl}
         pt={pt}
         pb={pb}
+        onClick={onClick}
         width="20"
         height="19"
         viewBox="0 0 20 19"

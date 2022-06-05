@@ -3,9 +3,18 @@ import { StyledSvg } from "./cart-svg";
 
 class CaretIcon extends Component {
   render() {
-    const { select } = this.props;
+    const { select, mr, ml, mt, mb, pr, pl, pt, pb, onClick } = this.props;
     return (
       <StyledSvg
+        mr={mr}
+        ml={ml}
+        mt={mt}
+        mb={mb}
+        pr={pr}
+        pl={pl}
+        pt={pt}
+        pb={pb}
+        onClick={onClick}
         width="8"
         height="4"
         viewBox="0 0 8 4"
