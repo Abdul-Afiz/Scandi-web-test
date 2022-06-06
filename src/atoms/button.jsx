@@ -4,6 +4,7 @@ import { colors } from "../styles/style-guide";
 
 const StyledButton = styled.button`
   display: block;
+  width: 100%;
   padding: 13px 29.5px;
   background: ${colors["primary"]};
   font-family: Raleway;

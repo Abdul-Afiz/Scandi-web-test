@@ -24,14 +24,14 @@ class AddIcon extends Component {
         <path
           d="M12 8V16"
           stroke="#1D1F22"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <path
           d="M8 12H16"
           stroke="#1D1F22"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <rect x="0.5" y="0.5" width="23" height="23" stroke="#1D1F22" />
       </StyledSvg>

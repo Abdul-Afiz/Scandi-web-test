@@ -1,6 +1,8 @@
 import { Component } from "react";
 import styled from "styled-components";
-import { Text } from "../styles/style-guide";
+import { css } from "styled-components";
+import { colors, Text } from "../styles/style-guide";
+import AddtoCaretIcon from "../vectors/add-to-caret-svg";
 
 const ProductWrapper = styled.div`
   display: flex;
@@ -16,15 +18,55 @@ const ProductWrapper = styled.div`
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb}px`};
-  & > img {
-    max-width: 100%;
-    object-fit: contain;
+  background-color: ${({ inStock }) => inStock && "#ffffffcf"};
+  position: relative;
+  ${({ inStock }) =>
+    inStock &&
+    css`
+      .inStock {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, 0);
+        top: 40%;
+        font-size: 24px;
+        line-height: 38.4px;
+        color: ${colors["grey_2"]};
+      }
+    `}
+
+  &:hover {
+    box-shadow: 0px 4px 35px 0px #a8acb030;
+    ${({ inStock }) =>
+      !inStock &&
+      css`
+        .add-item {
+          display: block;
+        }
+      `}
+  }
+  .img {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: -1;
+    & > img {
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .add-item {
+    display: none;
+    position: absolute;
+    right: 15px;
+    bottom: -40px;
   }
 `;
 
 class Product extends Component {
   render() {
-    const { img, title, price, mr, ml, mt, mb, pr, pl, pt, pb } = this.props;
+    const { img, inStock, title, price, mr, ml, mt, mb, pr, pl, pt, pb } =
+      this.props;
+
     return (
       <ProductWrapper
         mr={mr}
@@ -35,14 +77,23 @@ class Product extends Component {
         pl={pl}
         pt={pt}
         pb={pb}
+        inStock={!inStock && true}
       >
-        <img src={img} alt={title} />
+        <div className="img">
+          <img src={img} alt={title} />
+          <div className="add-item">
+            <AddtoCaretIcon />
+          </div>
+        </div>
         <Text fw="thin" size={18} mt={24} mb={8}>
           {title}
         </Text>
         <Text fw="medium" size={18}>
           ${price.toFixed(2)}
         </Text>
+        {!inStock && (
+          <div className={!inStock ? "inStock" : ""}>OUT OF STOCK</div>
+        )}
       </ProductWrapper>
     );
   }

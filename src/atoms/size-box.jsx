@@ -4,9 +4,9 @@ import { colors } from "../styles/style-guide";
 
 const StyledBox = styled.div`
   text-align: center;
-  padding: 8px;
+  line-height: 24px;
   font-size: 14px;
-  width: 50%;
+  width: 24px;
   font-weight: 400;
   font-family: "Source Sans Pro";
   text-transform: uppercase;

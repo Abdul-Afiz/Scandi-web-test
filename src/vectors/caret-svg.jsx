@@ -24,8 +24,8 @@ class CaretIcon extends Component {
         <path
           d={select ? "M1 3.5L4 0.5L7 3.5" : "M1 0.5L4 3.5L7 0.5"}
           stroke="black"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </StyledSvg>
     );
