@@ -18,7 +18,8 @@ const ProductWrapper = styled.div`
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb}px`};
-  background-color: ${({ inStock }) => inStock && "#ffffffcf"};
+
+  opacity: ${({ inStock }) => inStock && 0.5};
   position: relative;
   ${({ inStock }) =>
     inStock &&
@@ -62,7 +63,7 @@ const ProductWrapper = styled.div`
   }
 `;
 
-class Product extends Component {
+class ProductCard extends Component {
   render() {
     const { img, inStock, title, price, mr, ml, mt, mb, pr, pl, pt, pb } =
       this.props;
@@ -99,4 +100,4 @@ class Product extends Component {
   }
 }
 
-export default Product;
+export default ProductCard;

@@ -1,6 +1,6 @@
 import { Component } from "react";
 import styled from "styled-components";
-import Product from "../molecules/product";
+import ProductCard from "../molecules/product-card";
 import ScreenLayout from "../organism/screen-layout";
 import { connect } from "react-redux";
 
@@ -18,7 +18,7 @@ class CategoryPage extends Component {
       <ScreenLayout heading="Category name" size={42} pt={103} pb={191}>
         <CategoryStyle>
           {products.map((item) => (
-            <Product
+            <ProductCard
               key={`item_key_${item.id}`}
               img={item.img}
               price={item.price}

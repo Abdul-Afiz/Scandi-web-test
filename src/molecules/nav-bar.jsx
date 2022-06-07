@@ -91,6 +91,24 @@ const Nav = styled.nav`
       }
     }
   }
+  .cart-items {
+    position: relative;
+    .item-count {
+      position: absolute;
+      right: -0.6rem;
+      top: -0.65rem;
+      width: 20px;
+      height: 20px;
+      background-color: ${colors["black"]};
+      color: ${colors["white"]};
+      font-size: 14px;
+      font-weight: 700;
+      font-family: Roboto;
+      line-height: 20px;
+      text-align: center;
+      border-radius: 50%;
+    }
+  }
 `;
 
 const nav_links = [
@@ -161,6 +179,9 @@ class NavBar extends Component {
                   toggle();
                 }}
               />
+              {cartItems.length !== 0 && (
+                <div className="item-count">{cartItems.length}</div>
+              )}
             </div>
           </div>
           {
@@ -189,7 +210,7 @@ class NavBar extends Component {
               <Text fw="bold">
                 My Bag,{" "}
                 <Text fw="medium" inline>
-                  3 items
+                  {cartItems.length} items
                 </Text>
               </Text>
             </div>
