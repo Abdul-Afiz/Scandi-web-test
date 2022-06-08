@@ -24,7 +24,6 @@ const Nav = styled.nav`
   .cart-drawer {
     display: flex;
     flex-direction: column;
-    row-gap: 40px;
     position: absolute;
     background-color: white;
     max-width: 325px;
@@ -32,12 +31,22 @@ const Nav = styled.nav`
     transition: top 0.7s;
     right: calc(6% - 2rem);
     padding: 32px 16px;
-    & > div {
+    .total-items,
+    .cart-wrapper,
+    .btn,
+    .total {
       display: flex;
     }
-    & > .btn {
-      display: flex;
+    .cart-wrapper {
+      flex-direction: column;
+    }
+    .btn {
       column-gap: 12px;
+    }
+    .total {
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 34px;
     }
   }
 
@@ -134,10 +143,14 @@ const currency = [
   { id: 3, sign: "¥", value: "JPY" },
 ];
 class NavBar extends Component {
-  state = {
-    currency: "$",
-    showCurrency: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      currency: "$",
+      showCurrency: false,
+      totalCartAmount: 0,
+    };
+  }
   render() {
     const { cartItems, isAddedToCart, toggle } = this.props;
 
@@ -206,7 +219,7 @@ class NavBar extends Component {
             </div>
           }
           <div className="cart-drawer">
-            <div>
+            <div className="total-items">
               <Text fw="bold">
                 My Bag,{" "}
                 <Text fw="medium" inline>
@@ -214,9 +227,17 @@ class NavBar extends Component {
                 </Text>
               </Text>
             </div>
-            {cartItems.map((item) => (
-              <CartItem key={`cart_key_${item.id}`} cartItems={item} />
-            ))}
+            <div className="cart-wrapper">
+              {cartItems.map((item) => (
+                <CartItem key={`cart_key_${item.id}`} cartItems={item} />
+              ))}
+            </div>
+            <div className="total">
+              <Text fw="medium" lh={18}>
+                Total
+              </Text>
+              <Text fw="strong">${200.0}</Text>
+            </div>
             <div className="btn">
               <Button title="view bag" outline /> <Button title="check out" />
             </div>

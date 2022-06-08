@@ -3,8 +3,8 @@ import styled, { css } from "styled-components";
 import { colors } from "../styles/style-guide";
 
 const StyledColorBox = styled.div`
-  width: 16px;
-  height: 16px;
+  width: ${({ size }) => size || "16px"};
+  height: ${({ size }) => size || "16px"};
   background: ${({ color }) => color && color};
   ${({ selected }) =>
     selected &&
@@ -16,9 +16,10 @@ const StyledColorBox = styled.div`
 
 class ColorBox extends Component {
   render() {
-    const { selected, color, onClick } = this.props;
+    const { selected, color, onClick, size } = this.props;
     return (
       <StyledColorBox
+        size={size}
         selected={selected}
         onClick={onClick}
         color={color}

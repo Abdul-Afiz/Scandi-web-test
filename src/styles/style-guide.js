@@ -13,7 +13,7 @@ export const colors = {
   orange: "#EA8120",
 };
 
-export const fontSize = {
+export const fontWeight = {
   thin: 300,
   normal: 400,
   medium: 500,
@@ -33,9 +33,10 @@ export const Text = styled.span`
   padding-bottom: ${({ pb }) => `${pb}px`};
   display: ${({ inline }) => (inline ? "inline" : "block")};
   line-height: ${({ lh }) => `${lh ? lh : 25.6}px`};
+  font-family: ${({ font }) => font || "Raleway"};
   cursor: default;
   color: ${({ color, active }) =>
     `${color ? colors[color] : active ? colors["primary"] : colors["black"]} `};
   font-size: ${({ size }) => `${size ? size : 16}px`};
-  font-weight: ${({ fw }) => ` ${fw ? fontSize[fw] : fontSize["normal"]}`};
+  font-weight: ${({ fw }) => ` ${fw ? fontWeight[fw] : fontWeight["normal"]}`};
 `;
