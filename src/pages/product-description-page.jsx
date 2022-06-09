@@ -9,9 +9,9 @@ import ColorBox from "../atoms/color-box";
 import { splitTitle } from "../util/helper-function";
 
 export const PdpContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 0.3fr 1.5fr;
   margin-top: 80px;
-  column-gap: 40px;
 
   .small-img {
     display: flex;
@@ -29,14 +29,14 @@ export const PdpContainer = styled.div`
 
   .item-detail {
     display: grid;
-    column-gap: 100px;
-    grid-template-columns: 1fr 292px;
+    grid-template-columns: 0.75fr 292px;
+    column-gap: 50px;
 
     .big-img {
-      width: 100%;
+      max-width: 610px;
       max-height: 511px;
       & > img {
-        max-width: 100%;
+        width: 100%;
         height: 100%;
         object-fit: cover;
       }

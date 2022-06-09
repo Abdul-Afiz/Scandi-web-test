@@ -1,12 +1,12 @@
 import { Component } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { connect } from "react-redux";
 
 import NavBar from "../molecules/nav-bar";
 import { Text } from "../styles/style-guide";
 
 const Main = styled.main`
-  height: 100%;
+  /* display: flex; */
   max-width: 90%;
   margin: 0 auto;
   margin-right: ${({ mr }) => `${mr}px`};
@@ -16,7 +16,8 @@ const Main = styled.main`
   padding-right: ${({ pr }) => `${pr}px`};
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
-  padding-bottom: ${({ pb }) => `${pb}px`};
+  padding-bottom: ${({ pb }) => `${pb || 16}px`};
+
   .overlay {
     position: fixed;
     background: #39374838;
@@ -26,6 +27,10 @@ const Main = styled.main`
     right: 0;
     left: 0;
   }
+  /* .children {
+    flex: 1;
+    overflow: auto;
+  } */
 `;
 
 class ScreenLayout extends Component {
@@ -57,9 +62,19 @@ class ScreenLayout extends Component {
             </Text>
           </Main>
         )}
-        <Main mr={mr} ml={ml} mt={mt} mb={mb} pr={pr} pl={pl} pt={pt} pb={pb}>
+        <Main
+          mr={mr}
+          ml={ml}
+          mt={mt}
+          mb={mb}
+          pr={pr}
+          pl={pl}
+          pt={pt}
+          pb={pb}
+          overlow
+        >
           <div className={overlay ? "overlay" : ""}></div>
-          {children}
+          <div className="children">{children}</div>
         </Main>
       </div>
     );
