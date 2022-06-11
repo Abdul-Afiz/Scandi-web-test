@@ -2,7 +2,6 @@ import { Component } from "react";
 import styled from "styled-components";
 import { css } from "styled-components";
 import { colors, Text } from "../styles/style-guide";
-import AddtoCaretIcon from "../vectors/add-to-caret-svg";
 
 const ProductWrapper = styled.div`
   display: flex;
@@ -35,16 +34,6 @@ const ProductWrapper = styled.div`
       }
     `}
 
-  &:hover {
-    box-shadow: 0px 4px 35px 0px #a8acb030;
-    ${({ inStock }) =>
-      !inStock &&
-      css`
-        .add-item {
-          display: block;
-        }
-      `}
-  }
   .img {
     width: 100%;
     height: 100%;
@@ -55,18 +44,25 @@ const ProductWrapper = styled.div`
       object-fit: cover;
     }
   }
-  .add-item {
-    display: none;
-    position: absolute;
-    right: 15px;
-    bottom: -40px;
-  }
 `;
 
 class ProductCard extends Component {
   render() {
-    const { img, inStock, title, price, mr, ml, mt, mb, pr, pl, pt, pb } =
-      this.props;
+    const {
+      img,
+      inStock,
+      title,
+      price,
+      mr,
+      ml,
+      mt,
+      mb,
+      pr,
+      pl,
+      pt,
+      pb,
+      onClick,
+    } = this.props;
 
     return (
       <ProductWrapper
@@ -79,12 +75,10 @@ class ProductCard extends Component {
         pt={pt}
         pb={pb}
         inStock={!inStock && true}
+        onClick={onClick}
       >
         <div className="img">
           <img src={img} alt={title} />
-          <div className="add-item">
-            <AddtoCaretIcon />
-          </div>
         </div>
         <Text fw="thin" size={18} mt={24} mb={8}>
           {title}

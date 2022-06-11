@@ -71,7 +71,7 @@ const CartWrapper = styled.div`
   .total {
     display: grid;
     grid-template-columns: 279px 1fr;
-    padding-top: 32px;
+    padding-top: 3zxZ 2px;
     border-top: 1px solid #e5e5e5;
 
     .amount {

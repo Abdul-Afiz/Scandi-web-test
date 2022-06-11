@@ -1,14 +1,25 @@
 import { Component } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { connect } from "react-redux";
 
 import NavBar from "../molecules/nav-bar";
 import { Text } from "../styles/style-guide";
 
-const Main = styled.main`
-  /* display: flex; */
-  max-width: 90%;
+const MainWrapper = styled.main`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  .title {
+    margin: 0 auto;
+    width: 90%;
+    margin-bottom: 24px;
+  }
+`;
+
+const Main = styled.div`
   margin: 0 auto;
+  width: 90%;
   margin-right: ${({ mr }) => `${mr}px`};
   margin-left: ${({ ml }) => `${ml}px`};
   margin-top: ${({ mt }) => `${mt}px`};
@@ -17,7 +28,7 @@ const Main = styled.main`
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb || 16}px`};
-
+  overflow: auto;
   .overlay {
     position: fixed;
     background: #39374838;
@@ -27,10 +38,6 @@ const Main = styled.main`
     right: 0;
     left: 0;
   }
-  /* .children {
-    flex: 1;
-    overflow: auto;
-  } */
 `;
 
 class ScreenLayout extends Component {
@@ -53,14 +60,14 @@ class ScreenLayout extends Component {
       overlay,
     } = this.props;
     return (
-      <div>
+      <MainWrapper>
         <NavBar />
         {heading && (
-          <Main>
+          <div className="title">
             <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
               {heading}
             </Text>
-          </Main>
+          </div>
         )}
         <Main
           mr={mr}
@@ -74,9 +81,9 @@ class ScreenLayout extends Component {
           overlow
         >
           <div className={overlay ? "overlay" : ""}></div>
-          <div className="children">{children}</div>
+          {children}
         </Main>
-      </div>
+      </MainWrapper>
     );
   }
 }
