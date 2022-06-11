@@ -17,9 +17,6 @@ const CategoryStyle = styled.div`
       .show {
         display: block;
       }
-      /* .disable {
-        display: none;
-      } */
     }
     position: relative;
     .add-item {
