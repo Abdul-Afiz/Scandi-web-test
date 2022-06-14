@@ -59,7 +59,8 @@ const ItemsWrapper = styled.div`
 
 class CartItem extends Component {
   render() {
-    const { cartItems } = this.props;
+    const { cartItems, handleIncrementClick, handleDecrementClick } =
+      this.props;
     return (
       <ItemsWrapper>
         <div className="item-details">
@@ -99,11 +100,11 @@ class CartItem extends Component {
 
         <div className="item-calcs">
           <div className="item-calc">
-            <AddIcon />
+            <AddIcon onClick={handleIncrementClick} />
             <Text size={24} fw="medium" lh={38.4}>
               {cartItems.totalPurchase}
             </Text>
-            <RemoveIcon />
+            <RemoveIcon onClick={handleDecrementClick} />
           </div>
           <div className="item-img">
             <img src={cartItems.img} alt={cartItems.title} />

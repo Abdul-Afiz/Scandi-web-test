@@ -1,9 +1,10 @@
 import { Component } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import ProductCard from "../molecules/product-card";
 import ScreenLayout from "../organism/screen-layout";
 import { connect } from "react-redux";
 import AddtoCaretIcon from "../vectors/add-to-caret-svg";
+import { addToCart } from "../reducers/cart-items-reducer";
 
 const CategoryStyle = styled.div`
   display: grid;
@@ -29,10 +30,21 @@ const CategoryStyle = styled.div`
 `;
 
 class CategoryPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      products: [],
+    };
+  }
+
+  handleAddItemToCart = (item) => {
+    this.props.addToCart(item);
+  };
+  navigateToProductDescriptionPage = (id) => {
+    this.props.history.push(`/product/${id}`);
+  };
   render() {
     const { products } = this.props;
-
-    console.log(this.props);
     return (
       <ScreenLayout heading="Category name" size={42} pt={79} pb={191}>
         <CategoryStyle>
@@ -44,10 +56,12 @@ class CategoryPage extends Component {
                 price={item.price}
                 title={item.title}
                 inStock={item.inStock}
-                onClick={() => console.log("onClick to Product Description")}
+                onClick={() => this.navigateToProductDescriptionPage(item.id)}
               />
               <div className={`${item.inStock && "show"} add-item`}>
-                <AddtoCaretIcon onClick={() => console.log("add to cart")} />
+                <AddtoCaretIcon
+                  onClick={() => this.handleAddItemToCart(item)}
+                />
               </div>
             </div>
           ))}
@@ -57,6 +71,14 @@ class CategoryPage extends Component {
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addToCart: (item) => {
+      dispatch(addToCart(item));
+    },
+  };
+};
+
 const mapStateToProps = (state) => {
   console.log({ state });
   return {
@@ -64,4 +86,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(CategoryPage);
+export default connect(mapStateToProps, mapDispatchToProps)(CategoryPage);

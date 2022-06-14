@@ -7,6 +7,7 @@ import CartItem from "./cart-items";
 import Button from "../atoms/button";
 import { connect } from "react-redux";
 import { toggleAddedToCart } from "../reducers/is-added-to-cart-reducer";
+import { addToItem, deductFromItem } from "../reducers/cart-items-reducer";
 
 const Nav = styled.nav`
   width: 100%;
@@ -23,10 +24,12 @@ const Nav = styled.nav`
   }
   .cart-drawer {
     display: flex;
+    overflow: hidden;
     flex-direction: column;
     position: absolute;
-    background-color: white;
+    background-color: #ffffff;
     max-width: 325px;
+    max-height: 677px;
     top: ${({ overlay }) => (overlay ? "5rem" : "-50rem")};
     transition: top 0.7s;
     right: calc(6% - 2rem);
@@ -39,6 +42,7 @@ const Nav = styled.nav`
     }
     .cart-wrapper {
       flex-direction: column;
+      overflow: auto;
     }
     .btn {
       column-gap: 12px;
@@ -149,8 +153,16 @@ class NavBar extends Component {
       currency: "$",
       showCurrency: false,
       totalCartAmount: 0,
+      cartItems: [],
     };
   }
+  IncreaseCartItem = (item) => {
+    this.props.increaseItemInCart(item);
+  };
+  decreaseCartItem = (item) => {
+    this.props.deductItemInCart(item);
+  };
+
   render() {
     const { cartItems, isAddedToCart, toggle } = this.props;
 
@@ -193,7 +205,9 @@ class NavBar extends Component {
                 }}
               />
               {cartItems.length !== 0 && (
-                <div className="item-count">{cartItems.length}</div>
+                <div className="item-count">
+                  {cartItems.reduce((a, b) => a + b.totalPurchase, 0)}
+                </div>
               )}
             </div>
           </div>
@@ -223,20 +237,33 @@ class NavBar extends Component {
               <Text fw="bold">
                 My Bag,{" "}
                 <Text fw="medium" inline>
-                  {cartItems.length} items
+                  {cartItems.length !== 0
+                    ? cartItems.reduce((a, b) => a + b.totalPurchase, 0)
+                    : 0}{" "}
+                  items
                 </Text>
               </Text>
             </div>
             <div className="cart-wrapper">
               {cartItems.map((item) => (
-                <CartItem key={`cart_key_${item.id}`} cartItems={item} />
+                <CartItem
+                  key={`cart_key_${item.id}`}
+                  cartItems={item}
+                  handleIncrementClick={() => this.IncreaseCartItem(item)}
+                  handleDecrementClick={() => this.decreaseCartItem(item)}
+                />
               ))}
             </div>
             <div className="total">
               <Text fw="medium" lh={18}>
                 Total
               </Text>
-              <Text fw="strong">${200.0}</Text>
+              <Text fw="strong">
+                $
+                {cartItems.length !== 0
+                  ? cartItems.reduce((a, b) => a + b.price * b.totalPurchase, 0)
+                  : 0}
+              </Text>
             </div>
             <div className="btn">
               <Button title="view bag" outline /> <Button title="check out" />
@@ -258,6 +285,12 @@ const mapStateToProps = ({ cartItems, isAddedToCart }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     toggle: () => dispatch(toggleAddedToCart()),
+    increaseItemInCart: (item) => {
+      dispatch(addToItem(item));
+    },
+    deductItemInCart: (item) => {
+      dispatch(deductFromItem(item));
+    },
   };
 };
 

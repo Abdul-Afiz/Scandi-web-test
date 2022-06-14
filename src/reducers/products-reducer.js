@@ -1,13 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+// import { generateId } from "../util/helper-function";
 
 const initialState = [
   {
     id: 1,
     inStock: true,
-    title: "Apollo Running Short",
+    title: "Apollo Running Men",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
-    price: 50,
+    price: 70,
     size: ["xs", "s", "m", "l"],
     color: ["#D3D2D5", "#2B2B2B", "#0F6450"],
     totalPurchase: 0,
@@ -15,7 +16,7 @@ const initialState = [
   {
     id: 2,
     inStock: true,
-    title: "Apollo Running Short",
+    title: "Apollo Running Women",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
     price: 50,
@@ -26,10 +27,10 @@ const initialState = [
   {
     id: 3,
     inStock: false,
-    title: "Apollo Running Short",
+    title: "Apollo Running Top",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
-    price: 50,
+    price: 80,
     size: ["xs", "s", "m", "l"],
     color: ["#D3D2D5", "#2B2B2B", "#0F6450"],
     totalPurchase: 0,
@@ -37,10 +38,10 @@ const initialState = [
   {
     id: 4,
     inStock: true,
-    title: "Apollo Running Short",
+    title: "Apollo Running Middle",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
-    price: 50,
+    price: 150,
     size: ["xs", "s", "m", "l"],
     color: ["#D3D2D5", "#2B2B2B", "#0F6450"],
     totalPurchase: 0,
@@ -48,10 +49,10 @@ const initialState = [
   {
     id: 5,
     inStock: true,
-    title: "Apollo Running Short",
+    title: "Apollo Running Normal",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
-    price: 50,
+    price: 90,
     size: ["xs", "s", "m", "l"],
     color: ["#D3D2D5", "#2B2B2B", "#0F6450"],
     totalPurchase: 0,
@@ -59,7 +60,7 @@ const initialState = [
   {
     id: 6,
     inStock: true,
-    title: "Apollo Running Short",
+    title: "Apollo Running Big Shirt",
     img: "/product-image.png",
     images: ["/product-image.png", "/product-image.png", "/product-image.png"],
     price: 50,
