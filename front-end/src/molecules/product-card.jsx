@@ -64,7 +64,6 @@ class ProductCard extends Component {
       pb,
       onClick,
     } = this.props;
-
     return (
       <ProductWrapper
         mr={mr}
@@ -85,7 +84,8 @@ class ProductCard extends Component {
           {title}
         </Text>
         <Text fw="medium" size={18}>
-          ${price.toFixed(2)}
+          {price.currency.symbol}
+          {price.amount.toFixed(2)}
         </Text>
         {!inStock && (
           <div className={!inStock ? "inStock" : ""}>OUT OF STOCK</div>

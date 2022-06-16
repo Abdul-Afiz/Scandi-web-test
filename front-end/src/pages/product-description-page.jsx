@@ -1,12 +1,16 @@
 import { Component } from "react";
 import { connect } from "react-redux";
-import ScreenLayout from "../organism/screen-layout";
+import { Query } from "react-apollo";
 import styled from "styled-components";
+
+import ScreenLayout from "../organism/screen-layout";
 import { Text } from "../styles/style-guide";
 import SizeBox from "../atoms/size-box";
 import Button from "../atoms/button";
 import ColorBox from "../atoms/color-box";
 import { splitTitle } from "../util/helper-function";
+import { singleProductQuery } from "../query/queries";
+import { getProduct } from "../reducers/single-product-reducer";
 
 export const PdpContainer = styled.div`
   display: grid;
@@ -38,7 +42,7 @@ export const PdpContainer = styled.div`
       & > img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
       }
     }
     .item-details {
@@ -67,92 +71,189 @@ class ProductDescriptionPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: "",
+      product: null,
+      imgIndex: 0,
     };
   }
-  async componentDidMount() {
-    const id = this.props.match.params.id;
 
-    const findProduct = this.props.products.find((prod) => prod.id === +id);
-
-    this.setState({ products: findProduct });
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState((state) => ({
+        product: this.props.singleProduct,
+      }));
+    }, 1000);
   }
 
+  handleImgChange = (index) =>
+    this.setState((state) => ({
+      imgIndex: index,
+    }));
+
   render() {
-    const { products } = this.state;
     return (
-      <ScreenLayout>
-        {!products ? (
-          <h1>Loading...</h1>
-        ) : (
-          <PdpContainer>
-            <div className="small-img">
-              {products.images.map((img, i) => (
-                <div className="img" key={`img_key_${i}`}>
-                  <img src={img} alt={img} />
-                </div>
-              ))}
-            </div>
-            <div className="item-detail">
-              <div className="big-img">
-                <img src={products.img} alt={products.title} />
-              </div>
-              <div className="item-details">
-                <Text size={30} mb={16} fw="bold" lh={27}>
-                  {splitTitle(products.title).head}
-                </Text>
-                <Text size={30} mb={43} lh={27}>
-                  {splitTitle(products.title).tail}
-                </Text>
-                <div className="size">
-                  <Text size={18} mt={8} fw="strong">
-                    SIZE:
-                  </Text>
-                  <div className="box-size">
-                    {products.size.map((size, i) => (
-                      <SizeBox
-                        key={i}
-                        value={size}
-                        fs="16px"
-                        lh="45px"
-                        w="100%"
+      <Query
+        query={singleProductQuery}
+        variables={{ productId: this.props.match.params.id }}
+      >
+        {({ data, loading }) => {
+          let product;
+          if (loading) {
+            return <h1>Loading...</h1>;
+          } else {
+            product = data.product;
+            setTimeout(() => {
+              this.props.fetchSingleProduct(product);
+            });
+          }
+          console.log(this.state.product);
+
+          const { imgIndex } = this.state;
+          return (
+            <ScreenLayout>
+              {
+                <PdpContainer>
+                  <div className="small-img">
+                    {product.gallery.map((img, i) => (
+                      <div
+                        className="img"
+                        key={`img_key_${i}`}
+                        onClick={() => this.handleImgChange(i)}
+                      >
+                        <img src={img} alt={img} />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="item-detail">
+                    <div className="big-img">
+                      <img src={product.gallery[imgIndex]} alt={product.name} />
+                    </div>
+                    <div className="item-details">
+                      <Text size={30} mb={16} fw="bold" lh={27}>
+                        {splitTitle(product.name).head}
+                      </Text>
+                      <Text size={30} mb={43} lh={27}>
+                        {splitTitle(product.name).tail}
+                      </Text>
+                      {product.category === "tech" ? (
+                        <div className="color">
+                          {product.attributes.map(({ id, items }) => {
+                            if (id === "Color") {
+                              return (
+                                <div key={id}>
+                                  <Text size={18} fw="strong">
+                                    {id.toUpperCase()}:
+                                  </Text>
+                                  <div className="box-color">
+                                    {items.map(({ id, value }) => (
+                                      <ColorBox
+                                        key={id}
+                                        color={value}
+                                        size="36px"
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div key={id}>
+                                <Text size={16} mb={5} fw="strong">
+                                  {id.toUpperCase()}:
+                                </Text>
+                                <div className="box-color">
+                                  {items.map(({ id, value }) => (
+                                    <SizeBox
+                                      key={id}
+                                      value={value}
+                                      fs="16px"
+                                      lh="45px"
+                                      w="100%"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : product.category === "clothes" ? (
+                        <div className="size">
+                          {product.attributes.map(({ id, items }) => {
+                            return (
+                              <div key={id}>
+                                <Text size={16} mb={5} fw="strong">
+                                  {id.toUpperCase()}:
+                                </Text>
+                                <div className="box-size">
+                                  {items.map(({ id, value }) => (
+                                    <SizeBox
+                                      key={id}
+                                      value={value}
+                                      fs="16px"
+                                      lh="45px"
+                                      w="30%"
+                                    />
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      <Text mt={12} mb={10} size={16} fw="strong">
+                        PRICE:
+                      </Text>
+                      <Text fw="strong" size={24} lh={18} mb={20}>
+                        {this.props.currency}
+                        {
+                          product.prices.filter(
+                            (price) =>
+                              price.currency.symbol === this.props.currency
+                          )[0].amount
+                        }
+                      </Text>
+                      <Button
+                        title="Add to Cart"
+                        pt={16}
+                        pb={16}
+                        fs={16}
+                        mb={40}
                       />
-                    ))}
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: product.description,
+                        }}
+                      ></div>
+
+                      {/* <Text lh={25.59} font="Roboto">
+                      </Text> */}
+                    </div>
                   </div>
-                </div>
-                <div className="color">
-                  <Text size={18} fw="strong">
-                    COLOR:
-                  </Text>
-                  <div className="box-color">
-                    {products.color.map((color, i) => (
-                      <ColorBox key={i} color={color} size="36px" />
-                    ))}
-                  </div>
-                </div>
-                <Text mt={12} mb={10} size={16} fw="strong">
-                  PRICE:
-                </Text>
-                <Text fw="strong" size={24} lh={18} mb={20}>
-                  ${products.price.toFixed(2)}
-                </Text>
-                <Button title="Add to Cart" pt={16} pb={16} fs={16} mb={40} />
-                <Text lh={25.59} font="Roboto">
-                  {products.description}
-                </Text>
-              </div>
-            </div>
-          </PdpContainer>
-        )}
-      </ScreenLayout>
+                </PdpContainer>
+              }
+            </ScreenLayout>
+          );
+        }}
+      </Query>
     );
   }
 }
 
-const matchStateToProps = ({ products }) => {
+const matchStateToProps = ({ currency, singleProduct }) => {
   return {
-    products,
+    currency,
+    singleProduct,
   };
 };
 
-export default connect(matchStateToProps)(ProductDescriptionPage);
+const matchDispatchToProps = (dispatch) => {
+  return {
+    fetchSingleProduct: (item) => dispatch(getProduct(item)),
+  };
+};
+
+export default connect(
+  matchStateToProps,
+  matchDispatchToProps
+)(ProductDescriptionPage);

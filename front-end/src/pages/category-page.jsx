@@ -35,10 +35,6 @@ const CategoryStyle = styled.div`
 `;
 
 class CategoryPage extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   handleAddItemToCart = (item) => {
     this.props.addToCart(item);
   };
@@ -46,8 +42,8 @@ class CategoryPage extends Component {
     this.props.history.push(`/product/${id}`);
   };
   render() {
-    const { products, navlinks, fetchProduct } = this.props;
-    console.log(navlinks, products);
+    const { products, currency, navlinks, fetchProduct } = this.props;
+
     return (
       <Query query={productQuery} variables={{ category: { title: navlinks } }}>
         {({ data, loading }) => {
@@ -71,7 +67,11 @@ class CategoryPage extends Component {
                     <ProductCard
                       key={`item_key_${item.id}`}
                       img={item.gallery[0]}
-                      price={item.prices[0].amount}
+                      price={
+                        item.prices.filter(
+                          (price) => price.currency.symbol === currency
+                        )[0]
+                      }
                       title={item.name}
                       inStock={item.inStock}
                       onClick={() =>
@@ -105,10 +105,11 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-const mapStateToProps = ({ products, navlinks }) => {
+const mapStateToProps = ({ products, navlinks, currency }) => {
   return {
     products,
     navlinks,
+    currency,
   };
 };
 
