@@ -10,6 +10,7 @@ import { toggleAddedToCart } from "../reducers/is-added-to-cart-reducer";
 import { addToItem, deductFromItem } from "../reducers/cart-items-reducer";
 import { changeCategory } from "../reducers/nav-reducer";
 import { currencyQuery } from "../query/queries";
+import { priceFilter } from "../util/helper-function";
 
 import { Query } from "react-apollo";
 import { changeCurrency } from "../reducers/currency-reducer";
@@ -150,8 +151,7 @@ class NavBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currency: "$",
-      showCurrency: false,
+      toggleCurrency: false,
       totalCartAmount: 0,
       cartItems: [],
     };
@@ -172,7 +172,7 @@ class NavBar extends Component {
       setCurrency,
       currency,
     } = this.props;
-
+    console.log(cartItems);
     return (
       <Query query={currencyQuery}>
         {({ data, loading }) => {
@@ -181,7 +181,7 @@ class NavBar extends Component {
           }
           const { currencies } = data;
           return (
-            <Nav overlay={isAddedToCart} view={this.state.showCurrency}>
+            <Nav overlay={isAddedToCart} view={this.state.toggleCurrency}>
               <div className="container">
                 <div className="links">
                   {nav_links.map((link, i) => (
@@ -203,8 +203,8 @@ class NavBar extends Component {
                 <div className="icon">
                   <div
                     onClick={() => {
-                      this.setState(({ showCurrency }) => ({
-                        showCurrency: !showCurrency,
+                      this.setState(({ toggleCurrency }) => ({
+                        toggleCurrency: !toggleCurrency,
                       }));
                     }}
                   >
@@ -213,7 +213,7 @@ class NavBar extends Component {
                     </Text>
                     <CaretIcon
                       ml={10}
-                      select={this.state.showCurrency ? true : false}
+                      select={this.state.toggleCurrency ? true : false}
                     />
                   </div>
                   <div className="cart-items">
@@ -225,7 +225,7 @@ class NavBar extends Component {
                     />
                     {cartItems.length !== 0 && (
                       <div className="item-count">
-                        {cartItems.reduce((a, b) => a + b.totalPurchase, 0)}
+                        {cartItems.reduce((a, b) => a + b.quantity, 0)}
                       </div>
                     )}
                   </div>
@@ -242,9 +242,8 @@ class NavBar extends Component {
                           fw="medium"
                           size={18}
                           onClick={() => {
-                            this.setState(({ showCurrency }) => ({
-                              // currency: cur.symbol,
-                              showCurrency: !showCurrency,
+                            this.setState(({ toggleCurrency }) => ({
+                              toggleCurrency: !toggleCurrency,
                             }));
                             setCurrency(cur.symbol);
                           }}
@@ -261,7 +260,7 @@ class NavBar extends Component {
                       My Bag,{" "}
                       <Text fw="medium" inline>
                         {cartItems.length !== 0
-                          ? cartItems.reduce((a, b) => a + b.totalPurchase, 0)
+                          ? cartItems.reduce((a, b) => a + b.quantity, 0)
                           : 0}{" "}
                         items
                       </Text>
@@ -271,7 +270,7 @@ class NavBar extends Component {
                     {cartItems.map((item) => (
                       <CartItem
                         key={`cart_key_${item.id}`}
-                        cartItems={item}
+                        cartItem={item}
                         handleIncrementClick={() => this.IncreaseCartItem(item)}
                         handleDecrementClick={() => this.decreaseCartItem(item)}
                       />
@@ -284,10 +283,10 @@ class NavBar extends Component {
                     <Text fw="strong">
                       $
                       {cartItems.length !== 0
-                        ? cartItems.reduce(
-                            (a, b) => a + b.price * b.totalPurchase,
-                            0
-                          )
+                        ? cartItems.reduce((a, b) => {
+                            console.log(b);
+                            return a + priceFilter(b, currency) * b.quantity;
+                          }, 0)
                         : 0}
                     </Text>
                   </div>

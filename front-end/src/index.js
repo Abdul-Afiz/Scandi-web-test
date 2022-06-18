@@ -13,40 +13,6 @@ const client = new ApolloClient({
   uri: "http://localhost:4000/graphql",
 });
 
-// const productQuery = gql`
-//   query {
-//     category(input: { title: "clothes" }) {
-//       name
-//       products {
-//         id
-//         name
-//         inStock
-//         category
-//         brand
-//         description
-//         gallery
-//         prices {
-//           currency {
-//             label
-//             symbol
-//           }
-//           amount
-//         }
-//         attributes {
-//           id
-//           name
-//           type
-//           items {
-//             displayValue
-//             value
-//             id
-//           }
-//         }
-//       }
-//     }
-//   }
-// `;
-
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>

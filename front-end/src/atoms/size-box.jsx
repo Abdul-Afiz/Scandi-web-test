@@ -21,6 +21,7 @@ const StyledBox = styled.div`
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb}px`};
   border: 1px solid ${colors["black"]};
+  cursor: default;
   ${({ selected }) =>
     selected &&
     css`

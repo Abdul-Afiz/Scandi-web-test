@@ -8,9 +8,10 @@ import { Text } from "../styles/style-guide";
 import SizeBox from "../atoms/size-box";
 import Button from "../atoms/button";
 import ColorBox from "../atoms/color-box";
-import { splitTitle } from "../util/helper-function";
+import { setDefaultAtrributes, splitTitle } from "../util/helper-function";
 import { singleProductQuery } from "../query/queries";
 import { getProduct } from "../reducers/single-product-reducer";
+import { addToCart } from "../reducers/cart-items-reducer";
 
 export const PdpContainer = styled.div`
   display: grid;
@@ -72,16 +73,31 @@ class ProductDescriptionPage extends Component {
     super(props);
     this.state = {
       product: null,
+      selectedAttr: null,
       imgIndex: 0,
     };
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState((state) => ({
-        product: this.props.singleProduct,
-      }));
-    }, 1000);
+  async componentDidMount() {
+    try {
+      setTimeout(() => {
+        this.setState((state) => ({
+          product: this.props.singleProduct,
+          selectedAttr: setDefaultAtrributes(this.props.singleProduct),
+        }));
+      }, 1000);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  handleSelectAttr(name, item) {
+    this.setState((currentState) => ({
+      selectedAttr: {
+        ...currentState.selectedAttr,
+        [name]: item,
+      },
+    }));
   }
 
   handleImgChange = (index) =>
@@ -105,7 +121,6 @@ class ProductDescriptionPage extends Component {
               this.props.fetchSingleProduct(product);
             });
           }
-          console.log(this.state.product);
 
           const { imgIndex } = this.state;
           return (
@@ -136,19 +151,28 @@ class ProductDescriptionPage extends Component {
                       </Text>
                       {product.category === "tech" ? (
                         <div className="color">
-                          {product.attributes.map(({ id, items }) => {
-                            if (id === "Color") {
+                          {product.attributes.map(({ name, type, items }) => {
+                            if (type === "swatch") {
                               return (
-                                <div key={id}>
+                                <div key={name}>
                                   <Text size={18} fw="strong">
-                                    {id.toUpperCase()}:
+                                    {name.toUpperCase()}:
                                   </Text>
                                   <div className="box-color">
-                                    {items.map(({ id, value }) => (
+                                    {items.map((item) => (
                                       <ColorBox
-                                        key={id}
-                                        color={value}
+                                        onClick={() =>
+                                          this.handleSelectAttr(name, item)
+                                        }
+                                        key={item.id}
+                                        color={item.value}
                                         size="36px"
+                                        selected={
+                                          this.state.selectedAttr &&
+                                          item.id ===
+                                            this.state.selectedAttr[name]
+                                              .displayValue
+                                        }
                                       />
                                     ))}
                                   </div>
@@ -156,18 +180,27 @@ class ProductDescriptionPage extends Component {
                               );
                             }
                             return (
-                              <div key={id}>
+                              <div key={name}>
                                 <Text size={16} mb={5} fw="strong">
-                                  {id.toUpperCase()}:
+                                  {name.toUpperCase()}:
                                 </Text>
                                 <div className="box-color">
-                                  {items.map(({ id, value }) => (
+                                  {items.map((item) => (
                                     <SizeBox
-                                      key={id}
-                                      value={value}
+                                      onClick={() =>
+                                        this.handleSelectAttr(name, item)
+                                      }
+                                      key={item.id}
+                                      value={item.value}
                                       fs="16px"
                                       lh="45px"
                                       w="100%"
+                                      selected={
+                                        this.state.selectedAttr &&
+                                        item.id ===
+                                          this.state.selectedAttr[name]
+                                            .displayValue
+                                      }
                                     />
                                   ))}
                                 </div>
@@ -177,20 +210,30 @@ class ProductDescriptionPage extends Component {
                         </div>
                       ) : product.category === "clothes" ? (
                         <div className="size">
-                          {product.attributes.map(({ id, items }) => {
+                          {product.attributes.map(({ name, items }) => {
                             return (
-                              <div key={id}>
+                              <div key={name}>
                                 <Text size={16} mb={5} fw="strong">
-                                  {id.toUpperCase()}:
+                                  {name.toUpperCase()}:
                                 </Text>
                                 <div className="box-size">
-                                  {items.map(({ id, value }) => (
+                                  {items.map((item) => (
                                     <SizeBox
-                                      key={id}
-                                      value={value}
+                                      onClick={() =>
+                                        this.handleSelectAttr(name, item)
+                                      }
+                                      key={item.id}
+                                      value={item.value}
                                       fs="16px"
                                       lh="45px"
                                       w="30%"
+                                      active={item.id}
+                                      selected={
+                                        this.state.selectedAttr &&
+                                        item.id ===
+                                          this.state.selectedAttr[name]
+                                            .displayValue
+                                      }
                                     />
                                   ))}
                                 </div>
@@ -219,6 +262,13 @@ class ProductDescriptionPage extends Component {
                         pb={16}
                         fs={16}
                         mb={40}
+                        onClick={() =>
+                          this.props.addToCart({
+                            ...this.state.product,
+                            selectedOption: this.state.selectedAttr,
+                            quantity: 0,
+                          })
+                        }
                       />
                       <div
                         dangerouslySetInnerHTML={{
@@ -249,6 +299,9 @@ const matchStateToProps = ({ currency, singleProduct }) => {
 
 const matchDispatchToProps = (dispatch) => {
   return {
+    addToCart: (item) => {
+      dispatch(addToCart(item));
+    },
     fetchSingleProduct: (item) => dispatch(getProduct(item)),
   };
 };

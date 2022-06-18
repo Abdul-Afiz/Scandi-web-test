@@ -5,7 +5,9 @@ import SizeBox from "../atoms/size-box";
 import { Text } from "../styles/style-guide";
 import AddIcon from "../vectors/add-svg";
 import RemoveIcon from "../vectors/subtract-svg";
-import { splitTitle } from "../util/helper-function";
+import { splitTitle, priceFilter } from "../util/helper-function";
+import { connect } from "react-redux";
+import { addToCart, addToItem } from "../reducers/cart-items-reducer";
 
 const ItemsWrapper = styled.div`
   display: grid;
@@ -25,12 +27,14 @@ const ItemsWrapper = styled.div`
       display: flex;
       justify-content: flex-start;
       column-gap: 8px;
+      margin-top: 8px;
     }
     .color {
       display: flex;
       justify-content: flex-start;
       flex-direction: row;
       column-gap: 8px;
+      margin-top: 8px;
     }
   }
 
@@ -58,56 +62,135 @@ const ItemsWrapper = styled.div`
 `;
 
 class CartItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: "",
+      selectedOption: {},
+      quantity: 0,
+    };
+  }
+
+  addNewOption(id, attr) {
+    this.setState(({ selectedOption }) => ({
+      selectedOption: {
+        ...selectedOption,
+        [id]: attr,
+      },
+    }));
+  }
+
+  componentDidMount() {
+    this.setState(({ id, quantity }) => ({
+      id: this.props.cartItem.id,
+      quantity: this.props.cartItem.quantity,
+    }));
+  }
+
   render() {
-    const { cartItems, handleIncrementClick, handleDecrementClick } =
+    const { cartItem, handleIncrementClick, handleDecrementClick, currency } =
       this.props;
+
+    const findOption = (cart) => {
+      const item = cart.attributes.map(({ id, items }) => {
+        const selectArr = cart.selectedOption[cart.selectedOption.length - 1];
+        const findItem = items.find(
+          (item) => item.value === selectArr[id].value
+        );
+        return findItem.value;
+      });
+      return item;
+    };
+    console.log(this.state);
     return (
       <ItemsWrapper>
         <div className="item-details">
           <div className="item-detail">
             <div className="item-title">
-              <Text fw="thin">{splitTitle(cartItems.title).head}</Text>
-              <Text fw="thin">{splitTitle(cartItems.title).tail}</Text>
+              <Text fw="thin">{splitTitle(cartItem.name).head}</Text>
+              <Text fw="thin">{splitTitle(cartItem.name).tail}</Text>
             </div>
 
-            <Text fw="bold">${cartItems.price.toFixed(2)}</Text>
-            <Text size={14} lh={16}>
-              Size:
+            <Text fw="bold">
+              {currency}
+              {priceFilter(cartItem, currency)}
             </Text>
-            <div className="size">
-              {cartItems.size.map((size, i) => (
-                <SizeBox
-                  key={`size_id_${i}`}
-                  selected={i === 1 && true}
-                  value={size}
-                />
-              ))}
-            </div>
-            <Text size={14} lh={16}>
-              Color:
-            </Text>
-            <div className="color">
-              {cartItems.color.map((color, i) => (
-                <ColorBox
-                  key={`color_id_${i}`}
-                  selected={i === 0 && true}
-                  color={color}
-                />
-              ))}
-            </div>
+            {cartItem.category === "tech"
+              ? cartItem.attributes.map(({ items, type, name }) => {
+                  if (type === "swatch") {
+                    return (
+                      <div key={name}>
+                        <Text size={14} lh={16}>
+                          {name}:
+                        </Text>
+                        <div className="size">
+                          {items.map((item) => (
+                            <ColorBox
+                              onClick={() => this.addNewOption(name, item)}
+                              key={item.id}
+                              selected={findOption(cartItem).includes(
+                                item.value
+                              )}
+                              color={item.value}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div key={name}>
+                      <Text size={14} lh={16}>
+                        {name}:
+                      </Text>
+                      <div className="size">
+                        {items.map((item) => (
+                          <SizeBox
+                            onClick={() => this.addNewOption(name, item)}
+                            key={item.value}
+                            selected={findOption(cartItem).includes(item.value)}
+                            value={item.value}
+                            w="30%"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              : cartItem.category === "clothes"
+              ? cartItem.attributes.map(({ items, name }) => {
+                  return (
+                    <div key={name}>
+                      <Text size={14} lh={16}>
+                        {name}:
+                      </Text>
+                      <div className="size">
+                        {items.map((item) => (
+                          <SizeBox
+                            key={item.value}
+                            selected={findOption(cartItem).includes(item.value)}
+                            value={item.value}
+                            onClick={() => this.addNewOption(name, item)}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              : ""}
           </div>
         </div>
 
         <div className="item-calcs">
           <div className="item-calc">
-            <AddIcon onClick={handleIncrementClick} />
+            <AddIcon onClick={() => this.props.addOption({ ...this.state })} />
             <Text size={24} fw="medium" lh={38.4}>
-              {cartItems.totalPurchase}
+              {cartItem.quantity}
             </Text>
             <RemoveIcon onClick={handleDecrementClick} />
           </div>
           <div className="item-img">
-            <img src={cartItems.img} alt={cartItems.title} />
+            <img src={cartItem.gallery[0]} alt={cartItem.name} />
           </div>
         </div>
       </ItemsWrapper>
@@ -115,4 +198,16 @@ class CartItem extends Component {
   }
 }
 
-export default CartItem;
+const mapStateToProps = ({ currency }) => {
+  return {
+    currency,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addOption: (item) => dispatch(addToCart(item)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(CartItem);

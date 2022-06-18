@@ -6,17 +6,24 @@ const cartItemsSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const product = action.payload;
-      const findProduct = state.find((item) => item.title === product.title);
+      const findProduct = state.find((item) => item.id === product.id);
       if (findProduct) {
         const existingProduct = {
           ...findProduct,
-          totalPurchase: findProduct.totalPurchase + 1,
+          selectedOption: findProduct.selectedOption.concat(
+            product.selectedOption
+          ),
+          quantity: findProduct.quantity + 1,
         };
         return state.map((item) =>
-          item.title === findProduct.title ? existingProduct : item
+          item.id === findProduct.id ? existingProduct : item
         );
       } else {
-        state.push({ ...product, totalPurchase: product.totalPurchase + 1 });
+        state.push({
+          ...product,
+          selectedOption: [product.selectedOption],
+          quantity: product.quantity + 1,
+        });
       }
     },
     addToItem(state, action) {

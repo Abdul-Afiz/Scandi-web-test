@@ -4,7 +4,6 @@ import ProductCard from "../molecules/product-card";
 import ScreenLayout from "../organism/screen-layout";
 import { connect } from "react-redux";
 import AddtoCaretIcon from "../vectors/add-to-caret-svg";
-import { addToCart } from "../reducers/cart-items-reducer";
 
 import { Query } from "react-apollo";
 import { getProducts } from "../reducers/products-reducer";
@@ -74,13 +73,12 @@ class CategoryPage extends Component {
                       }
                       title={item.name}
                       inStock={item.inStock}
-                      onClick={() =>
-                        this.navigateToProductDescriptionPage(item.id)
-                      }
                     />
                     <div className={`${item.inStock && "show"} add-item`}>
                       <AddtoCaretIcon
-                        onClick={() => this.handleAddItemToCart(item)}
+                        onClick={() =>
+                          this.navigateToProductDescriptionPage(item.id)
+                        }
                       />
                     </div>
                   </div>
@@ -96,9 +94,6 @@ class CategoryPage extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    addToCart: (item) => {
-      dispatch(addToCart(item));
-    },
     fetchProduct: (products) => {
       dispatch(getProducts(products));
     },
