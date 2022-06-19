@@ -4,6 +4,10 @@ import { connect } from "react-redux";
 
 import NavBar from "../molecules/nav-bar";
 import { Text } from "../styles/style-guide";
+import {
+  closeMiniCart,
+  toggleAddedToCart,
+} from "../reducers/is-added-to-cart-reducer";
 
 const MainWrapper = styled.main`
   display: flex;
@@ -58,10 +62,11 @@ class ScreenLayout extends Component {
       pb,
       children,
       overlay,
+      navigate,
     } = this.props;
     return (
       <MainWrapper>
-        <NavBar />
+        <NavBar navigate={navigate} />
         {heading && (
           <div className="title">
             <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
@@ -79,6 +84,7 @@ class ScreenLayout extends Component {
           pt={pt}
           pb={pb}
           overlow
+          onClick={() => this.props.toggle(false)}
         >
           <div className={overlay ? "overlay" : ""}></div>
           {children}
@@ -93,4 +99,10 @@ const mapStateToProps = ({ isAddedToCart }) => {
   };
 };
 
-export default connect(mapStateToProps)(ScreenLayout);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggle: (value) => dispatch(closeMiniCart(value)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ScreenLayout);

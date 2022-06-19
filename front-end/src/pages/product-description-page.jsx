@@ -85,7 +85,7 @@ class ProductDescriptionPage extends Component {
           product: this.props.singleProduct,
           selectedAttr: setDefaultAtrributes(this.props.singleProduct),
         }));
-      }, 1000);
+      }, 1500);
     } catch (error) {
       console.log(error.message);
     }
@@ -123,8 +123,9 @@ class ProductDescriptionPage extends Component {
           }
 
           const { imgIndex } = this.state;
+
           return (
-            <ScreenLayout>
+            <ScreenLayout navigate={this.props.history}>
               {
                 <PdpContainer>
                   <div className="small-img">

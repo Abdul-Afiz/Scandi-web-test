@@ -7,7 +7,6 @@ import CartItem from "./cart-items";
 import Button from "../atoms/button";
 import { connect } from "react-redux";
 import { toggleAddedToCart } from "../reducers/is-added-to-cart-reducer";
-import { addToItem, deductFromItem } from "../reducers/cart-items-reducer";
 import { changeCategory } from "../reducers/nav-reducer";
 import { currencyQuery } from "../query/queries";
 import { priceFilter } from "../util/helper-function";
@@ -172,7 +171,7 @@ class NavBar extends Component {
       setCurrency,
       currency,
     } = this.props;
-    console.log(cartItems);
+
     return (
       <Query query={currencyQuery}>
         {({ data, loading }) => {
@@ -268,12 +267,7 @@ class NavBar extends Component {
                   </div>
                   <div className="cart-wrapper">
                     {cartItems.map((item) => (
-                      <CartItem
-                        key={`cart_key_${item.id}`}
-                        cartItem={item}
-                        handleIncrementClick={() => this.IncreaseCartItem(item)}
-                        handleDecrementClick={() => this.decreaseCartItem(item)}
-                      />
+                      <CartItem key={`cart_key_${item.id}`} cartItem={item} />
                     ))}
                   </div>
                   <div className="total">
@@ -283,15 +277,23 @@ class NavBar extends Component {
                     <Text fw="strong">
                       $
                       {cartItems.length !== 0
-                        ? cartItems.reduce((a, b) => {
-                            console.log(b);
-                            return a + priceFilter(b, currency) * b.quantity;
-                          }, 0)
+                        ? cartItems
+                            .reduce((a, b) => {
+                              return a + priceFilter(b, currency) * b.quantity;
+                            }, 0)
+                            .toFixed(2)
                         : 0}
                     </Text>
                   </div>
                   <div className="btn">
-                    <Button title="view bag" outline />{" "}
+                    <Button
+                      title="view bag"
+                      outline
+                      onClick={() => {
+                        this.props.navigate.push("/cart-items");
+                        toggle();
+                      }}
+                    />{" "}
                     <Button title="check out" />
                   </div>
                 </div>
@@ -317,12 +319,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     navigateToCategory: (link) => dispatch(changeCategory(link)),
     toggle: () => dispatch(toggleAddedToCart()),
-    increaseItemInCart: (item) => {
-      dispatch(addToItem(item));
-    },
-    deductItemInCart: (item) => {
-      dispatch(deductFromItem(item));
-    },
     setCurrency: (value) => {
       dispatch(changeCurrency(value));
     },

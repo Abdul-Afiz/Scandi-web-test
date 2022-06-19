@@ -16,9 +16,12 @@ import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
 
 const ItemsWrapper = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 276px 1fr;
   column-gap: 4px;
-  margin: 32px 0;
+  /* margin: 32px 0; */
+  padding-top: 24px;
+  padding-bottom: 22px;
+  border-top: 1px solid #e5e5e5;
   .item-details,
   .item-detail {
     display: flex;
@@ -32,6 +35,7 @@ const ItemsWrapper = styled.div`
       display: flex;
       justify-content: flex-start;
       column-gap: 8px;
+      margin-bottom: 16px;
       margin-top: 8px;
     }
     .color {
@@ -45,6 +49,7 @@ const ItemsWrapper = styled.div`
 
   .item-calcs {
     display: flex;
+    justify-content: flex-end;
     max-width: 100%;
 
     .item-calc {
@@ -52,15 +57,16 @@ const ItemsWrapper = styled.div`
       flex-direction: column;
       justify-content: space-between;
       align-items: center;
-      margin-right: 8px;
+      margin-right: 24px;
     }
 
     .item-img {
       display: flex;
-      max-width: 121px;
+      max-width: 200px;
       & > img {
-        max-width: 100%;
-        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
     }
   }
@@ -102,11 +108,15 @@ class CartItem extends Component {
         <div className="item-details">
           <div className="item-detail">
             <div className="item-title">
-              <Text fw="thin">{splitTitle(cartItem.name).head}</Text>
-              <Text fw="thin">{splitTitle(cartItem.name).tail}</Text>
+              <Text fw="bold" size={30} lh={27} mb={16}>
+                {splitTitle(cartItem.name).head}
+              </Text>
+              <Text size={30} lh={27}>
+                {splitTitle(cartItem.name).tail}
+              </Text>
             </div>
 
-            <Text fw="bold">
+            <Text mt={20} mb={20} fw="strong" size={24} lh={24}>
               {currency}
               {priceFilter(cartItem, currency)}
             </Text>
@@ -115,8 +125,8 @@ class CartItem extends Component {
                   if (type === "swatch") {
                     return (
                       <div key={name}>
-                        <Text size={14} lh={16}>
-                          {name}:
+                        <Text size={18} lh={18} fw="strong">
+                          {name.toUpperCase()}:
                         </Text>
                         <div className="size">
                           {items.map((item) => (
@@ -130,6 +140,7 @@ class CartItem extends Component {
                                   : findOption(cartItem).includes(item.value)
                               }
                               color={item.value}
+                              size="32px"
                             />
                           ))}
                         </div>
@@ -138,8 +149,8 @@ class CartItem extends Component {
                   }
                   return (
                     <div key={name}>
-                      <Text size={14} lh={16}>
-                        {name}:
+                      <Text size={18} lh={18} fw="strong">
+                        {name.toUpperCase()}:
                       </Text>
                       <div className="size">
                         {items.map((item) => (
@@ -153,7 +164,12 @@ class CartItem extends Component {
                                 : findOption(cartItem).includes(item.value)
                             }
                             value={item.value}
-                            w="30%"
+                            pt={12}
+                            pb={12}
+                            pr={28}
+                            pl={28}
+                            fs="16px"
+                            w="10%"
                           />
                         ))}
                       </div>
@@ -164,8 +180,8 @@ class CartItem extends Component {
               ? cartItem.attributes.map(({ items, name }) => {
                   return (
                     <div key={name}>
-                      <Text size={14} lh={16}>
-                        {name}:
+                      <Text size={18} lh={18} fw="strong">
+                        {name.toUpperCase()}:
                       </Text>
                       <div className="size">
                         {items.map((item) => {
@@ -180,6 +196,11 @@ class CartItem extends Component {
                               }
                               value={item.value}
                               onClick={() => this.addNewOption(name, item)}
+                              pt={12}
+                              pb={12}
+                              pr={28}
+                              pl={28}
+                              fs="16px"
                             />
                           );
                         })}

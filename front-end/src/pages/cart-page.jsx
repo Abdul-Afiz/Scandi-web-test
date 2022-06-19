@@ -2,13 +2,12 @@ import { Component } from "react";
 import styled from "styled-components";
 import ScreenLayout from "../organism/screen-layout";
 import { connect } from "react-redux";
-import AddIcon from "../vectors/add-svg";
-import RemoveIcon from "../vectors/subtract-svg";
-import SizeBox from "../atoms/size-box";
-import ColorBox from "../atoms/color-box";
+
 import { Text } from "../styles/style-guide";
-import { splitTitle } from "../util/helper-function";
+
 import Button from "../atoms/button";
+import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
+import CartItems from "../molecules/cart-page-item";
 
 const CartWrapper = styled.div`
   margin: 55px 0;
@@ -86,7 +85,14 @@ const CartWrapper = styled.div`
 class CartPage extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      imgIndex: 0,
+      product: {
+        id: "",
+        selectedOption: {},
+        quantity: 0,
+      },
+    };
     // const { cartItems } = this.props;
     // this.items = cartItems;
     // console.log(this.items);
@@ -99,57 +105,116 @@ class CartPage extends Component {
   //   }
 
   render() {
-    const { cartItems } = this.props;
-
+    const { cartItems, currency } = this.props;
+    console.log(cartItems);
     return (
       <ScreenLayout mb={55} heading="CART" size={32} fw="strong">
         <CartWrapper>
           {cartItems.map((item) => (
-            <div className="items" key={`item_keys_${item.title}`}>
+            <CartItems key={item.id} cartItem={item} />
+          ))}
+          {/* {cartItems.map((cartItem) => (
+            <div className="items" key={`item_keys_${cartItem.title}`}>
               <div className="item-details">
                 <div className="item-detail">
                   <div className="item-title">
                     <Text fw="bold" size={30} lh={27} mb={16}>
-                      {splitTitle(item.title).head}
+                      {splitTitle(cartItem.name).head}
                     </Text>
                     <Text size={30} lh={27}>
-                      {splitTitle(item.title).tail}
+                      {splitTitle(cartItem.name).tail}
                     </Text>
                   </div>
 
                   <Text mt={20} mb={20} fw="strong" size={24} lh={24}>
-                    ${item.price.toFixed(2)}
+                    {currency}
+                    {priceFilter(cartItem, currency)}
                   </Text>
-                  <Text size={18} lh={18} fw="strong">
-                    Size:
-                  </Text>
-                  <div className="size">
-                    {item.size.map((size, i) => (
-                      <SizeBox
-                        key={`size_id_${i}`}
-                        selected={i === 1 && true}
-                        value={size}
-                        pt={12}
-                        pb={12}
-                        pr={28}
-                        pl={28}
-                        fs="16px"
-                      />
-                    ))}
-                  </div>
-                  <Text size={14} lh={16}>
-                    Color:
-                  </Text>
-                  <div className="color">
-                    {item.color.map((color, i) => (
-                      <ColorBox
-                        key={`color_id_${i}`}
-                        selected={i === 0 && true}
-                        color={color}
-                        size="32px"
-                      />
-                    ))}
-                  </div>
+                  {cartItem.category === "tech"
+                    ? cartItem.attributes.map(({ items, type, name }) => {
+                        if (type === "swatch") {
+                          return (
+                            <div key={name}>
+                              <Text size={14} lh={16}>
+                                {name}:
+                              </Text>
+                              <div className="size">
+                                {items.map((item) => (
+                                  <ColorBox
+                                    onClick={() =>
+                                      this.addNewOption(name, item)
+                                    }
+                                    key={item.id}
+                                    selected={findOption(cartItem).includes(
+                                      item.value
+                                    )}
+                                    color={item.value}
+                                    size="32px"
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={name}>
+                            <Text size={18} lh={18} fw="strong">
+                              {name}:
+                            </Text>
+                            <div className="size">
+                              {items.map((item) => (
+                                <SizeBox
+                                  onClick={() => this.addNewOption(name, item)}
+                                  key={item.value}
+                                  selected={findOption(cartItem).includes(
+                                    item.value
+                                  )}
+                                  value={item.value}
+                                  pt={12}
+                                  pb={12}
+                                  pr={28}
+                                  pl={28}
+                                  fs="16px"
+                                  w="30%"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })
+                    : cartItem.category === "clothes"
+                    ? cartItem.attributes.map(({ items, name }) => {
+                        return (
+                          <div key={name}>
+                            <Text size={18} lh={18}>
+                              {name}:
+                            </Text>
+                            <div className="size">
+                              {items.map((item) => {
+                                console.log({ item });
+                                return (
+                                  <SizeBox
+                                    key={item.value}
+                                    selected={findOption(cartItem).includes(
+                                      item.value
+                                    )}
+                                    value={item.value}
+                                    onClick={() =>
+                                      this.addNewOption(name, item)
+                                    }
+                                    pt={12}
+                                    pb={12}
+                                    pr={28}
+                                    pl={28}
+                                    fs="16px"
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })
+                    : ""}
                 </div>
               </div>
 
@@ -157,16 +222,16 @@ class CartPage extends Component {
                 <div className="item-calc">
                   <AddIcon />
                   <Text size={24} fw="medium" lh={38.4}>
-                    {item.totalPurchase}
+                    {cartItem.quantity}
                   </Text>
                   <RemoveIcon />
                 </div>
                 <div className="item-img">
-                  <img src={item.img} alt={item.title} />
+                  <img src={cartItem.gallery[0]} alt={cartItem.name} />
                 </div>
               </div>
             </div>
-          ))}
+          ))} */}
           <div className="total">
             <div className="total-1">
               <div className="amount">
@@ -202,9 +267,17 @@ class CartPage extends Component {
   }
 }
 
-const mapStateToProps = ({ cartItems }) => {
+const mapStateToProps = ({ cartItems, currency }) => {
   return {
     cartItems,
+    currency,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    addOption: (item) => dispatch(addToCart(item)),
+    removeOption: (id) => dispatch(removeFromCart(id)),
   };
 };
 

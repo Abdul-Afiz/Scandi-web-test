@@ -7,6 +7,7 @@ const cartItemsSlice = createSlice({
     addToCart(state, action) {
       const product = action.payload;
       const findProduct = state.find((item) => item.id === product.id);
+      console.log({ findProduct });
       if (findProduct) {
         const existingProduct = {
           ...findProduct,
@@ -26,35 +27,24 @@ const cartItemsSlice = createSlice({
         });
       }
     },
-    addToItem(state, action) {
-      const item = action.payload;
-      const findItem = state.find((product) => product.id === item.id);
-      console.log(item, findItem);
+
+    removeFromCart(state, action) {
+      const id = action.payload;
+      const findItem = state.find((product) => product.id === id);
+      console.log({ id });
       if (findItem) {
-        const existingItem = {
+        const modifiedItem = {
           ...findItem,
-          totalPurchase: findItem.totalPurchase + 1,
+          selectedOption: findItem.selectedOption.filter(
+            (attr, i, arr) => i !== arr.length - 1
+          ),
+          quantity: findItem.quantity === 0 ? 0 : findItem.quantity - 1,
         };
-        return state.map((item) =>
-          item.id === findItem.id ? existingItem : item
-        );
-      }
-    },
-    deductFromItem(state, action) {
-      const item = action.payload;
-      const findItem = state.find((product) => product.id === item.id);
-      if (findItem) {
-        const existingItem = {
-          ...findItem,
-          totalPurchase: findItem.totalPurchase - 1,
-        };
-        return state.map((item) =>
-          item.id === findItem.id ? existingItem : item
-        );
+        return state.map((item) => (item.id === id ? modifiedItem : item));
       }
     },
   },
 });
 
-export const { addToCart, addToItem, deductFromItem } = cartItemsSlice.actions;
+export const { addToCart, removeFromCart } = cartItemsSlice.actions;
 export default cartItemsSlice.reducer;
