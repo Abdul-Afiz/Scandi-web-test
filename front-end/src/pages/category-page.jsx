@@ -59,6 +59,7 @@ class CategoryPage extends Component {
               size={42}
               pt={79}
               pb={191}
+              navigate={this.props.history}
             >
               <CategoryStyle>
                 {products.map((item) => (

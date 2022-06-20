@@ -7,7 +7,7 @@ const cartItemsSlice = createSlice({
     addToCart(state, action) {
       const product = action.payload;
       const findProduct = state.find((item) => item.id === product.id);
-      console.log({ findProduct });
+
       if (findProduct) {
         const existingProduct = {
           ...findProduct,
@@ -31,7 +31,7 @@ const cartItemsSlice = createSlice({
     removeFromCart(state, action) {
       const id = action.payload;
       const findItem = state.find((product) => product.id === id);
-      console.log({ id });
+
       if (findItem) {
         const modifiedItem = {
           ...findItem,

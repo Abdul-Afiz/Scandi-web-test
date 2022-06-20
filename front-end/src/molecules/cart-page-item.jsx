@@ -13,15 +13,17 @@ import {
 } from "../util/helper-function";
 import { connect } from "react-redux";
 import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
+import PrevIcon from "../vectors/prev-svg";
+import NextIcon from "../vectors/next-svg";
 
 const ItemsWrapper = styled.div`
   display: grid;
   grid-template-columns: 276px 1fr;
   column-gap: 4px;
-  /* margin: 32px 0; */
   padding-top: 24px;
   padding-bottom: 22px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid
+    ${({ blackborder }) => (blackborder ? "#000000" : "#e5e5e5")};
   .item-details,
   .item-detail {
     display: flex;
@@ -63,10 +65,18 @@ const ItemsWrapper = styled.div`
     .item-img {
       display: flex;
       max-width: 200px;
+      position: relative;
       & > img {
         width: 100%;
         height: 100%;
         object-fit: contain;
+      }
+      .img-nav {
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+        display: flex;
+        column-gap: 8px;
       }
     }
   }
@@ -76,35 +86,59 @@ class CartItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: "",
-      selectedOption: {},
-      quantity: 0,
+      imgIndex: 0,
+      product: {
+        id: "",
+        selectedOption: {},
+        quantity: 0,
+      },
     };
   }
 
   addNewOption(id, attr) {
-    this.setState(({ selectedOption }) => ({
-      selectedOption: {
-        ...selectedOption,
-        [id]: attr,
+    this.setState(({ product }) => ({
+      product: {
+        ...product,
+        selectedOption: {
+          [id]: attr,
+        },
       },
     }));
   }
 
+  nextImg() {
+    this.setState((state) => ({
+      ...state,
+      imgIndex:
+        state.imgIndex < this.props.cartItem.gallery.length - 1
+          ? state.imgIndex + 1
+          : this.props.cartItem.gallery.length - 1,
+    }));
+  }
+
+  prevImg() {
+    this.setState((state) => ({
+      ...state,
+      imgIndex: state.imgIndex > 0 ? state.imgIndex - 1 : 0,
+    }));
+  }
+
   componentDidMount() {
-    this.setState(() => ({
-      id: this.props.cartItem.id,
-      selectedOption: setCartMiniDefaultAtrributes(this.props.cartItem),
-      quantity: this.props.cartItem.quantity,
+    this.setState((state) => ({
+      ...state,
+      product: {
+        id: this.props.cartItem.id,
+        selectedOption: setCartMiniDefaultAtrributes(this.props.cartItem),
+        quantity: this.props.cartItem.quantity,
+      },
     }));
   }
 
   render() {
-    const { cartItem, currency } = this.props;
+    const { cartItem, currency, blackborder } = this.props;
 
-    console.log(this.state);
     return (
-      <ItemsWrapper>
+      <ItemsWrapper blackborder={blackborder}>
         <div className="item-details">
           <div className="item-detail">
             <div className="item-title">
@@ -134,9 +168,11 @@ class CartItem extends Component {
                               onClick={() => this.addNewOption(name, item)}
                               key={item.id}
                               selected={
-                                this.state.selectedOption.hasOwnProperty(name)
-                                  ? this.state.selectedOption[name].value ===
-                                    item.value
+                                this.state.product.selectedOption.hasOwnProperty(
+                                  name
+                                )
+                                  ? this.state.product.selectedOption[name]
+                                      .value === item.value
                                   : findOption(cartItem).includes(item.value)
                               }
                               color={item.value}
@@ -158,9 +194,11 @@ class CartItem extends Component {
                             onClick={() => this.addNewOption(name, item)}
                             key={item.value}
                             selected={
-                              this.state.selectedOption.hasOwnProperty(name)
-                                ? this.state.selectedOption[name].value ===
-                                  item.value
+                              this.state.product.selectedOption.hasOwnProperty(
+                                name
+                              )
+                                ? this.state.product.selectedOption[name]
+                                    .value === item.value
                                 : findOption(cartItem).includes(item.value)
                             }
                             value={item.value}
@@ -189,9 +227,11 @@ class CartItem extends Component {
                             <SizeBox
                               key={item.value}
                               selected={
-                                this.state.selectedOption.hasOwnProperty(name)
-                                  ? this.state.selectedOption[name].value ===
-                                    item.value
+                                this.state.product.selectedOption.hasOwnProperty(
+                                  name
+                                )
+                                  ? this.state.product.selectedOption[name]
+                                      .value === item.value
                                   : findOption(cartItem).includes(item.value)
                               }
                               value={item.value}
@@ -214,16 +254,25 @@ class CartItem extends Component {
 
         <div className="item-calcs">
           <div className="item-calc">
-            <AddIcon onClick={() => this.props.addOption({ ...this.state })} />
+            <AddIcon
+              onClick={() => this.props.addOption({ ...this.state.product })}
+            />
             <Text size={24} fw="medium" lh={38.4}>
               {cartItem.quantity}
             </Text>
             <RemoveIcon
-              onClick={() => this.props.removeOption(this.state.id)}
+              onClick={() => this.props.removeOption(this.state.product.id)}
             />
           </div>
           <div className="item-img">
-            <img src={cartItem.gallery[0]} alt={cartItem.name} />
+            <img
+              src={cartItem.gallery[this.state.imgIndex]}
+              alt={cartItem.name}
+            />
+            <div className="img-nav">
+              <PrevIcon onClick={() => this.prevImg()} />
+              <NextIcon onClick={() => this.nextImg()} />
+            </div>
           </div>
         </div>
       </ItemsWrapper>

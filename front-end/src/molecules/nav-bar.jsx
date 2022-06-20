@@ -179,6 +179,7 @@ class NavBar extends Component {
             return <h1>Loading...</h1>;
           }
           const { currencies } = data;
+          const { navigate } = this.props;
           return (
             <Nav overlay={isAddedToCart} view={this.state.toggleCurrency}>
               <div className="container">
@@ -190,15 +191,20 @@ class NavBar extends Component {
                       }`}
                       active={link.category === navlinks && true}
                       key={`link_id_${link.id}`}
-                      onClick={() =>
-                        this.props.navigateToCategory(link.category)
-                      }
+                      onClick={() => {
+                        this.props.navigateToCategory(link.category);
+                        this.props.navigate.push("/");
+                      }}
                     >
                       {link.title}
                     </Text>
                   ))}
                 </div>
-                <img src="/a-logo.png" alt="logo" />
+                <img
+                  src="/a-logo.png"
+                  alt="logo"
+                  onClick={() => this.props.navigate.push("/")}
+                />
                 <div className="icon">
                   <div
                     onClick={() => {
@@ -275,7 +281,7 @@ class NavBar extends Component {
                       Total
                     </Text>
                     <Text fw="strong">
-                      $
+                      {currency}
                       {cartItems.length !== 0
                         ? cartItems
                             .reduce((a, b) => {
@@ -290,7 +296,7 @@ class NavBar extends Component {
                       title="view bag"
                       outline
                       onClick={() => {
-                        this.props.navigate.push("/cart-items");
+                        navigate.push("/cart-items");
                         toggle();
                       }}
                     />{" "}

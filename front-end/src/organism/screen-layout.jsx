@@ -4,10 +4,7 @@ import { connect } from "react-redux";
 
 import NavBar from "../molecules/nav-bar";
 import { Text } from "../styles/style-guide";
-import {
-  closeMiniCart,
-  toggleAddedToCart,
-} from "../reducers/is-added-to-cart-reducer";
+import { closeMiniCart } from "../reducers/is-added-to-cart-reducer";
 
 const MainWrapper = styled.main`
   display: flex;
@@ -32,7 +29,7 @@ const Main = styled.div`
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb || 16}px`};
-  overflow: auto;
+  overflow: ${({ overflow }) => (overflow ? overflow : "auto")};
   .overlay {
     position: fixed;
     background: #39374838;
@@ -63,6 +60,7 @@ class ScreenLayout extends Component {
       children,
       overlay,
       navigate,
+      overflow,
     } = this.props;
     return (
       <MainWrapper>
@@ -83,7 +81,7 @@ class ScreenLayout extends Component {
           pl={pl}
           pt={pt}
           pb={pb}
-          overlow
+          overflow={overflow}
           onClick={() => this.props.toggle(false)}
         >
           <div className={overlay ? "overlay" : ""}></div>
