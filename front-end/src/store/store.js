@@ -1,3 +1,6 @@
+// eslint-disable-next-line
+import Symbol_observable from "symbol-observable";
+
 import { configureStore } from "@reduxjs/toolkit";
 import cartItemsReducer from "../reducers/cart-items-reducer";
 import currencyReducer from "../reducers/currency-reducer";
@@ -12,7 +15,7 @@ const store = configureStore({
     isAddedToCart: isAddedToCartReducer,
     products: productsReducer,
     cartItems: cartItemsReducer,
-    currency: currencyReducer,
+    allCurrency: currencyReducer,
     singleProduct: singleProductReducer,
   },
 });

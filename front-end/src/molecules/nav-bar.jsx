@@ -7,12 +7,13 @@ import CartItem from "./cart-items";
 import Button from "../atoms/button";
 import { connect } from "react-redux";
 import { toggleAddedToCart } from "../reducers/is-added-to-cart-reducer";
-import { changeCategory } from "../reducers/nav-reducer";
-import { currencyQuery } from "../query/queries";
+import { changelink, setLinks } from "../reducers/nav-reducer";
+import { ALL_CATEGORY_QUERY, CURRENCY_QUERY } from "../query/queries";
 import { priceFilter } from "../util/helper-function";
 
-import { Query } from "react-apollo";
-import { changeCurrency } from "../reducers/currency-reducer";
+import { changeCurrency, getCurrencies } from "../reducers/currency-reducer";
+import { CombinedField } from "@tilework/opus";
+import Server from "../query/client";
 
 const Nav = styled.nav`
   width: 100%;
@@ -128,33 +129,60 @@ const Nav = styled.nav`
     }
   }
 `;
-
-const nav_links = [
-  {
-    id: 1,
-    category: "all",
-    title: "ALL",
-  },
-  {
-    id: 2,
-    category: "clothes",
-    title: "CLOTHES",
-  },
-  {
-    id: 3,
-    category: "tech",
-    title: "TECH",
-  },
-];
 class NavBar extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
       toggleCurrency: false,
       totalCartAmount: 0,
-      cartItems: [],
+      category: "",
+      currency: [],
+      link: "",
     };
   }
+
+  async componentDidMount() {
+    try {
+      const { currencies, categories } = await Server.post(
+        new CombinedField().add(ALL_CATEGORY_QUERY).add(CURRENCY_QUERY)
+      );
+      // this.props.changeCategory(currentLink ? currentLink : categories[0].name);
+      this.props.setCurrencies(currencies);
+      this.props.setCurrency(currencies[0].symbol);
+      const id = this.props.navId ? this.props.navId : "all";
+      console.log(id);
+      const currentLink = categories.find(({ name }) => name === id).name;
+      console.log({ categories });
+      this.props.setCategory(categories);
+      currencies &&
+        this.props.setShow((state) => ({
+          ...state,
+          show: true,
+        }));
+      // categories &&
+      //   this.setState((state) => ({
+      //     ...state,
+      //     link: categories.find(({ name }) => name === this.props.navId).name,
+      //   }));
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  // async componentDidUpdate(prevProps, prevState) {
+  //   // console.log(prevProps, prevState, this.props.link);
+  //   if (prevProps.link !== this.props.link) {
+  //     const { categories } = await Server.post(ALL_CATEGORY_QUERY);
+  //     const currentLink =
+  //       categories &&
+  //       categories.find(({ name }) => name === this.props.navId).name;
+  //     this.props.setCategory(categories);
+  //     this.props.changeCategory(currentLink);
+  //     console.log(this.props.link);
+  //   }
+  // }
+
   IncreaseCartItem = (item) => {
     this.props.increaseItemInCart(item);
   };
@@ -168,163 +196,170 @@ class NavBar extends Component {
       isAddedToCart,
       toggle,
       navlinks,
+      link,
       setCurrency,
       currency,
+      currencies,
     } = this.props;
 
+    if (!navlinks || !currencies) {
+      return <h1>Loading...</h1>;
+    }
+    console.log(this.state.link);
+    const { navigate } = this.props;
+
     return (
-      <Query query={currencyQuery}>
-        {({ data, loading }) => {
-          if (loading) {
-            return <h1>Loading...</h1>;
-          }
-          const { currencies } = data;
-          const { navigate } = this.props;
-          return (
-            <Nav overlay={isAddedToCart} view={this.state.toggleCurrency}>
-              <div className="container">
-                <div className="links">
-                  {nav_links.map((link, i) => (
-                    <Text
-                      className={`link ${
-                        link.category === navlinks ? "active" : ""
-                      }`}
-                      active={link.category === navlinks && true}
-                      key={`link_id_${link.id}`}
-                      onClick={() => {
-                        this.props.navigateToCategory(link.category);
-                        this.props.navigate.push("/");
-                      }}
-                    >
-                      {link.title}
-                    </Text>
-                  ))}
+      <Nav overlay={isAddedToCart} view={this.state.toggleCurrency}>
+        <div className="container">
+          <div className="links">
+            {navlinks.map((name) => (
+              <Text
+                className={`link ${name === link ? "active" : ""}`}
+                active={name === link && true}
+                key={`link_id_${name}`}
+                onClick={() => {
+                  this.props.changeCategory(name);
+                  this.props.navigate.push(`/${name}`);
+                  this.setState((state) => ({
+                    ...state,
+                    link: name,
+                  }));
+                }}
+              >
+                {name.toUpperCase()}
+              </Text>
+            ))}
+          </div>
+          <img
+            src="/a-logo.png"
+            alt="logo"
+            onClick={() => this.props.navigate.push("/")}
+          />
+          <div className="icon">
+            <div
+              onClick={() => {
+                this.setState(({ toggleCurrency }) => ({
+                  toggleCurrency: !toggleCurrency,
+                }));
+              }}
+            >
+              <Text fw="medium" size={18}>
+                {currency}
+              </Text>
+              <CaretIcon
+                ml={10}
+                select={this.state.toggleCurrency ? true : false}
+              />
+            </div>
+            <div className="cart-items">
+              <CartIcon
+                ml={22}
+                onClick={() => {
+                  toggle();
+                }}
+              />
+              {cartItems.length !== 0 && (
+                <div className="item-count">
+                  {cartItems.reduce((a, b) => a + b.quantity, 0)}
                 </div>
-                <img
-                  src="/a-logo.png"
-                  alt="logo"
-                  onClick={() => this.props.navigate.push("/")}
-                />
-                <div className="icon">
-                  <div
+              )}
+            </div>
+          </div>
+          {
+            <div className="currencies">
+              {currencies.map((cur) => (
+                <div className="currency" key={`currencies_key_${cur.label}`}>
+                  <Text
+                    className="cur-value"
+                    fw="medium"
+                    size={18}
                     onClick={() => {
                       this.setState(({ toggleCurrency }) => ({
                         toggleCurrency: !toggleCurrency,
                       }));
+                      setCurrency(cur.symbol);
                     }}
                   >
-                    <Text fw="medium" size={18}>
-                      {currency}
-                    </Text>
-                    <CaretIcon
-                      ml={10}
-                      select={this.state.toggleCurrency ? true : false}
-                    />
-                  </div>
-                  <div className="cart-items">
-                    <CartIcon
-                      ml={22}
-                      onClick={() => {
-                        toggle();
-                      }}
-                    />
-                    {cartItems.length !== 0 && (
-                      <div className="item-count">
-                        {cartItems.reduce((a, b) => a + b.quantity, 0)}
-                      </div>
-                    )}
-                  </div>
+                    {cur.symbol} {cur.label}
+                  </Text>
                 </div>
-                {
-                  <div className="currencies">
-                    {currencies.map((cur) => (
-                      <div
-                        className="currency"
-                        key={`currencies_key_${cur.label}`}
-                      >
-                        <Text
-                          className="cur-value"
-                          fw="medium"
-                          size={18}
-                          onClick={() => {
-                            this.setState(({ toggleCurrency }) => ({
-                              toggleCurrency: !toggleCurrency,
-                            }));
-                            setCurrency(cur.symbol);
-                          }}
-                        >
-                          {cur.symbol} {cur.label}
-                        </Text>
-                      </div>
-                    ))}
-                  </div>
-                }
-                <div className="cart-drawer">
-                  <div className="total-items">
-                    <Text fw="bold">
-                      My Bag,{" "}
-                      <Text fw="medium" inline>
-                        {cartItems.length !== 0
-                          ? cartItems.reduce((a, b) => a + b.quantity, 0)
-                          : 0}{" "}
-                        items
-                      </Text>
-                    </Text>
-                  </div>
-                  <div className="cart-wrapper">
-                    {cartItems.map((item) => (
-                      <CartItem key={`cart_key_${item.id}`} cartItem={item} />
-                    ))}
-                  </div>
-                  <div className="total">
-                    <Text fw="medium" lh={18}>
-                      Total
-                    </Text>
-                    <Text fw="strong">
-                      {currency}
-                      {cartItems.length !== 0
-                        ? cartItems
-                            .reduce((a, b) => {
-                              return a + priceFilter(b, currency) * b.quantity;
-                            }, 0)
-                            .toFixed(2)
-                        : 0}
-                    </Text>
-                  </div>
-                  <div className="btn">
-                    <Button
-                      title="view bag"
-                      outline
-                      onClick={() => {
-                        navigate.push("/cart-items");
-                        toggle();
-                      }}
-                    />{" "}
-                    <Button title="check out" />
-                  </div>
-                </div>
-              </div>
-            </Nav>
-          );
-        }}
-      </Query>
+              ))}
+            </div>
+          }
+          <div className="cart-drawer">
+            <div className="total-items">
+              <Text fw="bold">
+                My Bag,{" "}
+                <Text fw="medium" inline>
+                  {cartItems.length !== 0
+                    ? cartItems.reduce((a, b) => a + b.quantity, 0)
+                    : 0}{" "}
+                  items
+                </Text>
+              </Text>
+            </div>
+            <div className="cart-wrapper">
+              {cartItems.map((item) => (
+                <CartItem key={`cart_key_${item.id}`} cartItem={item} />
+              ))}
+            </div>
+            <div className="total">
+              <Text fw="medium" lh={18}>
+                Total
+              </Text>
+              <Text fw="strong">
+                {currency}
+                {cartItems.length !== 0
+                  ? cartItems
+                      .reduce((a, b) => {
+                        return a + priceFilter(b, currency) * b.quantity;
+                      }, 0)
+                      .toFixed(2)
+                  : 0}
+              </Text>
+            </div>
+            <div className="btn">
+              <Button
+                title="view bag"
+                outline
+                onClick={() => {
+                  navigate.push("/cart-items");
+                  toggle();
+                }}
+              />{" "}
+              <Button title="check out" />
+            </div>
+          </div>
+        </div>
+      </Nav>
     );
   }
 }
 
-const mapStateToProps = ({ cartItems, isAddedToCart, navlinks, currency }) => {
+const mapStateToProps = ({
+  cartItems,
+  isAddedToCart,
+  navlinks: { links, link },
+  allCurrency: { currency, currencies },
+}) => {
   return {
-    cartItems: cartItems,
-    isAddedToCart: isAddedToCart,
-    navlinks,
+    cartItems,
+    isAddedToCart,
+    navlinks: links,
+    link,
     currency,
+    currencies,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    navigateToCategory: (link) => dispatch(changeCategory(link)),
+    setCategory: (link) => dispatch(setLinks(link)),
+    changeCategory: (link) => dispatch(changelink(link)),
     toggle: () => dispatch(toggleAddedToCart()),
+    setCurrencies: (value) => {
+      dispatch(getCurrencies(value));
+    },
     setCurrency: (value) => {
       dispatch(changeCurrency(value));
     },

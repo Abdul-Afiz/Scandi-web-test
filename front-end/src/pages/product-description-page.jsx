@@ -121,7 +121,7 @@ class ProductDescriptionPage extends Component {
               this.props.fetchSingleProduct(product);
             });
           }
-
+          console.log(this.props.currency);
           const { imgIndex } = this.state;
 
           return (
@@ -276,9 +276,6 @@ class ProductDescriptionPage extends Component {
                           __html: product.description,
                         }}
                       ></div>
-
-                      {/* <Text lh={25.59} font="Roboto">
-                      </Text> */}
                     </div>
                   </div>
                 </PdpContainer>
@@ -291,7 +288,7 @@ class ProductDescriptionPage extends Component {
   }
 }
 
-const matchStateToProps = ({ currency, singleProduct }) => {
+const matchStateToProps = ({ allCurrency: { currency }, singleProduct }) => {
   return {
     currency,
     singleProduct,

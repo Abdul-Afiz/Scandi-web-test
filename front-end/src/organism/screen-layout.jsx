@@ -42,9 +42,15 @@ const Main = styled.div`
 `;
 
 class ScreenLayout extends Component {
+  constructor(props) {
+    super(props);
+    this.setState = this.setState.bind(this);
+    this.state = {
+      show: false,
+    };
+  }
   render() {
     const {
-      heading,
       fw,
       size,
       ht,
@@ -60,40 +66,57 @@ class ScreenLayout extends Component {
       children,
       overlay,
       navigate,
+      navId,
       overflow,
+      link,
     } = this.props;
+
     return (
       <MainWrapper>
-        <NavBar navigate={navigate} />
-        {heading && (
+        <NavBar
+          navId={navId}
+          navigate={navigate}
+          show={this.state.show}
+          setShow={this.setState}
+        />
+        {link && (
           <div className="title">
             <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
-              {heading}
+              {link.toUpperCase()}
             </Text>
           </div>
         )}
-        <Main
-          mr={mr}
-          ml={ml}
-          mt={mt}
-          mb={mb}
-          pr={pr}
-          pl={pl}
-          pt={pt}
-          pb={pb}
-          overflow={overflow}
-          onClick={() => this.props.toggle(false)}
-        >
-          <div className={overlay ? "overlay" : ""}></div>
-          {children}
-        </Main>
+        {this.state.show && (
+          <Main
+            mr={mr}
+            ml={ml}
+            mt={mt}
+            mb={mb}
+            pr={pr}
+            pl={pl}
+            pt={pt}
+            pb={pb}
+            overflow={overflow}
+            onClick={() => {
+              this.props.toggle(false);
+              // this.setState((state) => ({
+              //   ...this.state,
+              //   show: false,
+              // }));
+            }}
+          >
+            <div className={overlay ? "overlay" : ""}></div>
+            {children}
+          </Main>
+        )}
       </MainWrapper>
     );
   }
 }
-const mapStateToProps = ({ isAddedToCart }) => {
+const mapStateToProps = ({ isAddedToCart, navlinks: { link } }) => {
   return {
     overlay: isAddedToCart,
+    link,
   };
 };
 

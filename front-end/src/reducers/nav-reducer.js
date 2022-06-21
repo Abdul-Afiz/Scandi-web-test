@@ -2,13 +2,26 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const navSlice = createSlice({
   name: "navbar",
-  initialState: "all",
+  initialState: {
+    links: "",
+    link: "",
+  },
   reducers: {
-    changeCategory(state, action) {
-      return action.payload;
+    setLinks(state, action) {
+      return {
+        ...state,
+        links: action.payload.map(({ name }) => name),
+      };
+    },
+    changelink(state, action) {
+      return {
+        ...state,
+        link: action.payload,
+      };
     },
   },
 });
 
-export const { changeCategory } = navSlice.actions;
+export const { setLinks, changelink } = navSlice.actions;
+
 export default navSlice.reducer;

@@ -9,6 +9,7 @@ class App extends Component {
     return (
       <Switch>
         <Route path="/" exact component={CategoryPage} />
+        <Route path="/:id" component={CategoryPage} />
         <Route path="/product/:id" component={PDP} />
         <Route path="/cart-items" component={CartPage} />
       </Switch>

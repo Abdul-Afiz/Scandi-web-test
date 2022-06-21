@@ -3,7 +3,7 @@ import { StyledSvg } from "./cart-svg";
 
 class AddtoCaretIcon extends Component {
   render() {
-    const { select, mr, ml, mt, mb, pr, pl, pt, pb, onClick } = this.props;
+    const { mr, ml, mt, mb, pr, pl, pt, pb, onClick } = this.props;
     return (
       <StyledSvg
         mr={mr}

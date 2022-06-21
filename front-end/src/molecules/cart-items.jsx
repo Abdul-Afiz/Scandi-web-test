@@ -95,6 +95,7 @@ class CartItem extends Component {
 
   render() {
     const { cartItem, currency } = this.props;
+
     return (
       <ItemsWrapper>
         <div className="item-details">
