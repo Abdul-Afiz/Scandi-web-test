@@ -1,22 +1,41 @@
 import { Component } from "react";
 import { connect } from "react-redux";
-import { Query } from "react-apollo";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
+import parse from "html-react-parser";
 
 import ScreenLayout from "../organism/screen-layout";
-import { Text } from "../styles/style-guide";
+import { colors, Text } from "../styles/style-guide";
 import SizeBox from "../atoms/size-box";
 import Button from "../atoms/button";
 import ColorBox from "../atoms/color-box";
-import { setDefaultAtrributes, splitTitle } from "../util/helper-function";
-import { singleProductQuery } from "../query/queries";
+
+import { priceFilter, setDefaultAtrributes } from "../util/helper-function";
 import { getProduct } from "../reducers/single-product-reducer";
 import { addToCart } from "../reducers/cart-items-reducer";
 
+import Server from "../query/client";
+import { SINGLE_PRODUCT } from "../query/queries";
 export const PdpContainer = styled.div`
+  height: 100%;
   display: grid;
   grid-template-columns: 0.3fr 1.5fr;
-  margin-top: 80px;
+
+  ${({ inStock }) =>
+    inStock &&
+    css`
+      position: relative;
+      opacity: 0.3;
+      pointer-events: none;
+      .not-in-stock {
+        position: absolute;
+        color: ${colors["grey_2"]};
+        left: 50%;
+        transform: translate(-50%, 0);
+        top: 40%;
+        font-size: 32px;
+        line-height: 38.4px;
+      }
+    `}
 
   .small-img {
     display: flex;
@@ -40,6 +59,7 @@ export const PdpContainer = styled.div`
     .big-img {
       max-width: 610px;
       max-height: 511px;
+
       & > img {
         width: 100%;
         height: 100%;
@@ -80,14 +100,15 @@ class ProductDescriptionPage extends Component {
 
   async componentDidMount() {
     try {
-      setTimeout(() => {
-        this.setState((state) => ({
-          product: this.props.singleProduct,
-          selectedAttr: setDefaultAtrributes(this.props.singleProduct),
-        }));
-      }, 1500);
+      const { id } = this.props.match.params;
+      const { product } = await Server.post(SINGLE_PRODUCT(id));
+      product && this.props.fetchSingleProduct(product);
+      this.setState(() => ({
+        product: product,
+        selectedAttr: setDefaultAtrributes(product),
+      }));
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   }
 
@@ -106,184 +127,165 @@ class ProductDescriptionPage extends Component {
     }));
 
   render() {
-    return (
-      <Query
-        query={singleProductQuery}
-        variables={{ productId: this.props.match.params.id }}
-      >
-        {({ data, loading }) => {
-          let product;
-          if (loading) {
-            return <h1>Loading...</h1>;
-          } else {
-            product = data.product;
-            setTimeout(() => {
-              this.props.fetchSingleProduct(product);
-            });
-          }
-          console.log(this.props.currency);
-          const { imgIndex } = this.state;
+    const { imgIndex } = this.state;
+    const product = this.props.singleProduct;
+    if (product.length === 0) {
+      return <h1>Loading!!!!</h1>;
+    }
 
-          return (
-            <ScreenLayout navigate={this.props.history}>
-              {
-                <PdpContainer>
-                  <div className="small-img">
-                    {product.gallery.map((img, i) => (
-                      <div
-                        className="img"
-                        key={`img_key_${i}`}
-                        onClick={() => this.handleImgChange(i)}
-                      >
-                        <img src={img} alt={img} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="item-detail">
-                    <div className="big-img">
-                      <img src={product.gallery[imgIndex]} alt={product.name} />
-                    </div>
-                    <div className="item-details">
-                      <Text size={30} mb={16} fw="bold" lh={27}>
-                        {splitTitle(product.name).head}
-                      </Text>
-                      <Text size={30} mb={43} lh={27}>
-                        {splitTitle(product.name).tail}
-                      </Text>
-                      {product.category === "tech" ? (
-                        <div className="color">
-                          {product.attributes.map(({ name, type, items }) => {
-                            if (type === "swatch") {
-                              return (
-                                <div key={name}>
-                                  <Text size={18} fw="strong">
-                                    {name.toUpperCase()}:
-                                  </Text>
-                                  <div className="box-color">
-                                    {items.map((item) => (
-                                      <ColorBox
-                                        onClick={() =>
-                                          this.handleSelectAttr(name, item)
-                                        }
-                                        key={item.id}
-                                        color={item.value}
-                                        size="36px"
-                                        selected={
-                                          this.state.selectedAttr &&
-                                          item.id ===
-                                            this.state.selectedAttr[name]
-                                              .displayValue
-                                        }
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
-                              );
-                            }
-                            return (
-                              <div key={name}>
-                                <Text size={16} mb={5} fw="strong">
-                                  {name.toUpperCase()}:
-                                </Text>
-                                <div className="box-color">
-                                  {items.map((item) => (
-                                    <SizeBox
-                                      onClick={() =>
-                                        this.handleSelectAttr(name, item)
-                                      }
-                                      key={item.id}
-                                      value={item.value}
-                                      fs="16px"
-                                      lh="45px"
-                                      w="100%"
-                                      selected={
-                                        this.state.selectedAttr &&
-                                        item.id ===
-                                          this.state.selectedAttr[name]
-                                            .displayValue
-                                      }
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })}
+    return (
+      <ScreenLayout
+        navigate={this.props.history}
+        heading={null}
+        overflow={!product.inStock ? "hidden" : "auto"}
+      >
+        {
+          <PdpContainer inStock={!product.inStock}>
+            {!product.inStock && (
+              <div className="not-in-stock">OUT OF STOCK</div>
+            )}
+            <div className="small-img">
+              {product.gallery.map((img, i) => (
+                <div
+                  className="img"
+                  key={`img_key_${i}`}
+                  onClick={() => this.handleImgChange(i)}
+                >
+                  <img src={img} alt={img} />
+                </div>
+              ))}
+            </div>
+            <div className="item-detail">
+              <div className="big-img">
+                <img src={product.gallery[imgIndex]} alt={product.name} />
+              </div>
+              <div className="item-details">
+                <Text size={30} mb={16} fw="bold" lh={27}>
+                  {product.brand}
+                </Text>
+                <Text size={30} mb={43} lh={27}>
+                  {product.name}
+                </Text>
+                {product.category === "tech" ? (
+                  <div className="color">
+                    {product.attributes.map(({ name, type, items }) => {
+                      if (type === "swatch") {
+                        return (
+                          <div key={name}>
+                            <Text size={18} fw="strong">
+                              {name.toUpperCase()}:
+                            </Text>
+                            <div className="box-color">
+                              {items.map((item) => (
+                                <ColorBox
+                                  onClick={() =>
+                                    this.handleSelectAttr(name, item)
+                                  }
+                                  key={item.id}
+                                  color={item.value}
+                                  size="36px"
+                                  selected={
+                                    this.state.selectedAttr &&
+                                    item.id ===
+                                      this.state.selectedAttr[name].displayValue
+                                  }
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div key={name}>
+                          <Text size={16} mb={5} fw="strong">
+                            {name.toUpperCase()}:
+                          </Text>
+                          <div className="box-color">
+                            {items.map((item) => (
+                              <SizeBox
+                                onClick={() =>
+                                  this.handleSelectAttr(name, item)
+                                }
+                                key={item.id}
+                                value={item.value}
+                                fs="16px"
+                                lh="45px"
+                                w="100%"
+                                selected={
+                                  this.state.selectedAttr &&
+                                  item.id ===
+                                    this.state.selectedAttr[name].displayValue
+                                }
+                              />
+                            ))}
+                          </div>
                         </div>
-                      ) : product.category === "clothes" ? (
-                        <div className="size">
-                          {product.attributes.map(({ name, items }) => {
-                            return (
-                              <div key={name}>
-                                <Text size={16} mb={5} fw="strong">
-                                  {name.toUpperCase()}:
-                                </Text>
-                                <div className="box-size">
-                                  {items.map((item) => (
-                                    <SizeBox
-                                      onClick={() =>
-                                        this.handleSelectAttr(name, item)
-                                      }
-                                      key={item.id}
-                                      value={item.value}
-                                      fs="16px"
-                                      lh="45px"
-                                      w="30%"
-                                      active={item.id}
-                                      selected={
-                                        this.state.selectedAttr &&
-                                        item.id ===
-                                          this.state.selectedAttr[name]
-                                            .displayValue
-                                      }
-                                    />
-                                  ))}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        ""
-                      )}
-                      <Text mt={12} mb={10} size={16} fw="strong">
-                        PRICE:
-                      </Text>
-                      <Text fw="strong" size={24} lh={18} mb={20}>
-                        {this.props.currency}
-                        {
-                          product.prices.filter(
-                            (price) =>
-                              price.currency.symbol === this.props.currency
-                          )[0].amount
-                        }
-                      </Text>
-                      <Button
-                        title="Add to Cart"
-                        pt={16}
-                        pb={16}
-                        fs={16}
-                        mb={40}
-                        onClick={() =>
-                          this.props.addToCart({
-                            ...this.state.product,
-                            selectedOption: this.state.selectedAttr,
-                            quantity: 0,
-                          })
-                        }
-                      />
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html: product.description,
-                        }}
-                      ></div>
-                    </div>
+                      );
+                    })}
                   </div>
-                </PdpContainer>
-              }
-            </ScreenLayout>
-          );
-        }}
-      </Query>
+                ) : product.category === "clothes" ? (
+                  <div className="size">
+                    {product.attributes.map(({ name, items }) => {
+                      return (
+                        <div key={name}>
+                          <Text size={16} mb={5} fw="strong">
+                            {name.toUpperCase()}:
+                          </Text>
+                          <div className="box-size">
+                            {items.map((item) => (
+                              <SizeBox
+                                onClick={() =>
+                                  this.handleSelectAttr(name, item)
+                                }
+                                key={item.id}
+                                value={item.value}
+                                fs="16px"
+                                lh="45px"
+                                w="30%"
+                                active={item.id}
+                                selected={
+                                  this.state.selectedAttr &&
+                                  item.id ===
+                                    this.state.selectedAttr[name].displayValue
+                                }
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  ""
+                )}
+                <Text mt={12} mb={10} size={16} fw="strong">
+                  PRICE:
+                </Text>
+                <Text fw="strong" size={24} lh={18} mb={20}>
+                  {this.props.currency}
+                  {this.props.currency &&
+                    priceFilter(product, this.props.currency)}
+                </Text>
+                <Button
+                  title="Add to Cart"
+                  pt={16}
+                  pb={16}
+                  fs={16}
+                  mb={40}
+                  onClick={() =>
+                    this.props.addToCart({
+                      ...this.state.product,
+                      selectedOption: this.state.selectedAttr,
+                      quantity: 0,
+                    })
+                  }
+                />
+                <div>{parse(product.description)}</div>
+              </div>
+            </div>
+          </PdpContainer>
+        }
+      </ScreenLayout>
     );
   }
 }

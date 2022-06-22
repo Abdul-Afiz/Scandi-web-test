@@ -6,13 +6,16 @@ import { Text } from "../styles/style-guide";
 import AddIcon from "../vectors/add-svg";
 import RemoveIcon from "../vectors/subtract-svg";
 import {
-  splitTitle,
   priceFilter,
   setCartMiniDefaultAtrributes,
   findOption,
 } from "../util/helper-function";
 import { connect } from "react-redux";
-import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
+import {
+  addToCart,
+  removeFromCart,
+  removeItemFromCart,
+} from "../reducers/cart-items-reducer";
 import PrevIcon from "../vectors/prev-svg";
 import NextIcon from "../vectors/next-svg";
 
@@ -100,6 +103,7 @@ class CartItem extends Component {
       product: {
         ...product,
         selectedOption: {
+          ...product.selectedOption,
           [id]: attr,
         },
       },
@@ -136,23 +140,22 @@ class CartItem extends Component {
 
   render() {
     const { cartItem, currency, blackborder } = this.props;
-
     return (
       <ItemsWrapper blackborder={blackborder}>
         <div className="item-details">
           <div className="item-detail">
             <div className="item-title">
               <Text fw="bold" size={30} lh={27} mb={16}>
-                {splitTitle(cartItem.name).head}
+                {cartItem.brand}
               </Text>
               <Text size={30} lh={27}>
-                {splitTitle(cartItem.name).tail}
+                {cartItem.name}
               </Text>
             </div>
 
             <Text mt={20} mb={20} fw="strong" size={24} lh={24}>
               {currency}
-              {priceFilter(cartItem, currency)}
+              {currency && priceFilter(cartItem, currency)}
             </Text>
             {cartItem.category === "tech"
               ? cartItem.attributes.map(({ items, type, name }) => {
@@ -261,7 +264,13 @@ class CartItem extends Component {
               {cartItem.quantity}
             </Text>
             <RemoveIcon
-              onClick={() => this.props.removeOption(this.state.product.id)}
+              onClick={() =>
+                cartItem.selectedOption.length <= 1
+                  ? this.props.removeItem(this.state.product.id)
+                  : cartItem.selectedOption.length >= 1
+                  ? this.props.removeOption(this.state.product.id)
+                  : -1
+              }
             />
           </div>
           <div className="item-img">
@@ -280,7 +289,7 @@ class CartItem extends Component {
   }
 }
 
-const mapStateToProps = ({ currency }) => {
+const mapStateToProps = ({ allCurrency: { currency } }) => {
   return {
     currency,
   };
@@ -290,6 +299,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
     removeOption: (id) => dispatch(removeFromCart(id)),
+    removeItem: (id) => dispatch(removeItemFromCart(id)),
   };
 };
 

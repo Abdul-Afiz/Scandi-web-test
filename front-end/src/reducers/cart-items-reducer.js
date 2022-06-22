@@ -43,8 +43,17 @@ const cartItemsSlice = createSlice({
         return state.map((item) => (item.id === id ? modifiedItem : item));
       }
     },
+    removeItemFromCart(state, action) {
+      const id = action.payload;
+      const findItem = state.find((product) => product.id === id);
+
+      if (findItem) {
+        return state.filter((item) => item.id !== id);
+      }
+    },
   },
 });
 
-export const { addToCart, removeFromCart } = cartItemsSlice.actions;
+export const { addToCart, removeFromCart, removeItemFromCart } =
+  cartItemsSlice.actions;
 export default cartItemsSlice.reducer;

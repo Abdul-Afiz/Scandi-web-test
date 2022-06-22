@@ -6,7 +6,10 @@ import CaretIcon from "../vectors/caret-svg";
 import CartItem from "./cart-items";
 import Button from "../atoms/button";
 import { connect } from "react-redux";
-import { toggleAddedToCart } from "../reducers/is-added-to-cart-reducer";
+import {
+  toggleAddedToCart,
+  toggleShowCurrency,
+} from "../reducers/is-added-to-cart-reducer";
 import { changelink, setLinks } from "../reducers/nav-reducer";
 import { ALL_CATEGORY_QUERY, CURRENCY_QUERY } from "../query/queries";
 import { priceFilter } from "../util/helper-function";
@@ -130,58 +133,26 @@ const Nav = styled.nav`
   }
 `;
 class NavBar extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      toggleCurrency: false,
-      totalCartAmount: 0,
-      category: "",
-      currency: [],
-      link: "",
-    };
-  }
-
   async componentDidMount() {
     try {
       const { currencies, categories } = await Server.post(
         new CombinedField().add(ALL_CATEGORY_QUERY).add(CURRENCY_QUERY)
       );
-      // this.props.changeCategory(currentLink ? currentLink : categories[0].name);
       this.props.setCurrencies(currencies);
       this.props.setCurrency(currencies[0].symbol);
       const id = this.props.navId ? this.props.navId : "all";
-      console.log(id);
-      const currentLink = categories.find(({ name }) => name === id).name;
-      console.log({ categories });
       this.props.setCategory(categories);
+      const currentLink = categories.find(({ name }) => name === id).name;
+      this.props.changeCategory(currentLink);
       currencies &&
         this.props.setShow((state) => ({
           ...state,
           show: true,
         }));
-      // categories &&
-      //   this.setState((state) => ({
-      //     ...state,
-      //     link: categories.find(({ name }) => name === this.props.navId).name,
-      //   }));
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
     }
   }
-
-  // async componentDidUpdate(prevProps, prevState) {
-  //   // console.log(prevProps, prevState, this.props.link);
-  //   if (prevProps.link !== this.props.link) {
-  //     const { categories } = await Server.post(ALL_CATEGORY_QUERY);
-  //     const currentLink =
-  //       categories &&
-  //       categories.find(({ name }) => name === this.props.navId).name;
-  //     this.props.setCategory(categories);
-  //     this.props.changeCategory(currentLink);
-  //     console.log(this.props.link);
-  //   }
-  // }
 
   IncreaseCartItem = (item) => {
     this.props.increaseItemInCart(item);
@@ -195,21 +166,21 @@ class NavBar extends Component {
       cartItems,
       isAddedToCart,
       toggle,
+      toggleShowCurrency,
       navlinks,
       link,
       setCurrency,
       currency,
       currencies,
+      navigate,
+      showCurrency,
     } = this.props;
 
     if (!navlinks || !currencies) {
       return <h1>Loading...</h1>;
     }
-    console.log(this.state.link);
-    const { navigate } = this.props;
-
     return (
-      <Nav overlay={isAddedToCart} view={this.state.toggleCurrency}>
+      <Nav overlay={isAddedToCart} view={showCurrency}>
         <div className="container">
           <div className="links">
             {navlinks.map((name) => (
@@ -220,10 +191,6 @@ class NavBar extends Component {
                 onClick={() => {
                   this.props.changeCategory(name);
                   this.props.navigate.push(`/${name}`);
-                  this.setState((state) => ({
-                    ...state,
-                    link: name,
-                  }));
                 }}
               >
                 {name.toUpperCase()}
@@ -238,18 +205,13 @@ class NavBar extends Component {
           <div className="icon">
             <div
               onClick={() => {
-                this.setState(({ toggleCurrency }) => ({
-                  toggleCurrency: !toggleCurrency,
-                }));
+                toggleShowCurrency();
               }}
             >
               <Text fw="medium" size={18}>
                 {currency}
               </Text>
-              <CaretIcon
-                ml={10}
-                select={this.state.toggleCurrency ? true : false}
-              />
+              <CaretIcon ml={10} select={showCurrency ? true : false} />
             </div>
             <div className="cart-items">
               <CartIcon
@@ -274,9 +236,7 @@ class NavBar extends Component {
                     fw="medium"
                     size={18}
                     onClick={() => {
-                      this.setState(({ toggleCurrency }) => ({
-                        toggleCurrency: !toggleCurrency,
-                      }));
+                      toggleShowCurrency();
                       setCurrency(cur.symbol);
                     }}
                   >
@@ -338,13 +298,14 @@ class NavBar extends Component {
 
 const mapStateToProps = ({
   cartItems,
-  isAddedToCart,
+  isAddedToCart: { overLay, showCurrency },
   navlinks: { links, link },
   allCurrency: { currency, currencies },
 }) => {
   return {
     cartItems,
-    isAddedToCart,
+    isAddedToCart: overLay,
+    showCurrency,
     navlinks: links,
     link,
     currency,
@@ -357,6 +318,7 @@ const mapDispatchToProps = (dispatch) => {
     setCategory: (link) => dispatch(setLinks(link)),
     changeCategory: (link) => dispatch(changelink(link)),
     toggle: () => dispatch(toggleAddedToCart()),
+    toggleShowCurrency: () => dispatch(toggleShowCurrency()),
     setCurrencies: (value) => {
       dispatch(getCurrencies(value));
     },

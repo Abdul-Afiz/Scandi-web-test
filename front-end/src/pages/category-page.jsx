@@ -25,17 +25,20 @@ class CategoryPage extends Component {
   }
   async componentDidMount() {
     const id = this.props.match.params.id ? this.props.match.params.id : "all";
-    console.log(id);
     try {
       const { category } = await Server.post(SINGLE_CATEGORY_QUERY(id));
       this.props.fetchProduct(category.products);
-      console.log();
-      // this.setState((state) => ({
-      //   ...state,
-      //   link: name,
-      // }));
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+    }
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if (prevProps.match.params.id !== this.props.link) {
+      const {
+        category: { products },
+      } = await Server.post(SINGLE_CATEGORY_QUERY(this.props.link));
+      this.props.fetchProduct(products);
     }
   }
   render() {

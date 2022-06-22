@@ -6,13 +6,16 @@ import { Text } from "../styles/style-guide";
 import AddIcon from "../vectors/add-svg";
 import RemoveIcon from "../vectors/subtract-svg";
 import {
-  splitTitle,
   priceFilter,
   setCartMiniDefaultAtrributes,
   findOption,
 } from "../util/helper-function";
 import { connect } from "react-redux";
-import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
+import {
+  addToCart,
+  removeFromCart,
+  removeItemFromCart,
+} from "../reducers/cart-items-reducer";
 
 const ItemsWrapper = styled.div`
   display: grid;
@@ -60,7 +63,7 @@ const ItemsWrapper = styled.div`
       max-width: 121px;
       & > img {
         max-width: 100%;
-        object-fit: cover;
+        object-fit: contain;
       }
     }
   }
@@ -101,13 +104,13 @@ class CartItem extends Component {
         <div className="item-details">
           <div className="item-detail">
             <div className="item-title">
-              <Text fw="thin">{splitTitle(cartItem.name).head}</Text>
-              <Text fw="thin">{splitTitle(cartItem.name).tail}</Text>
+              <Text fw="thin">{cartItem.brand}</Text>
+              <Text fw="thin">{cartItem.name}</Text>
             </div>
 
             <Text fw="bold">
               {currency}
-              {priceFilter(cartItem, currency)}
+              {currency && priceFilter(cartItem, currency)}
             </Text>
             {cartItem.category === "tech"
               ? cartItem.attributes.map(({ items, type, name }) => {
@@ -197,7 +200,13 @@ class CartItem extends Component {
               {cartItem.quantity}
             </Text>
             <RemoveIcon
-              onClick={() => this.props.removeOption(this.state.id)}
+              onClick={() =>
+                cartItem.selectedOption.length <= 1
+                  ? this.props.removeItem(this.state.id)
+                  : cartItem.selectedOption.length >= 1
+                  ? this.props.removeOption(this.state.id)
+                  : -1
+              }
             />
           </div>
           <div className="item-img">
@@ -209,7 +218,7 @@ class CartItem extends Component {
   }
 }
 
-const mapStateToProps = ({ currency }) => {
+const mapStateToProps = ({ allCurrency: { currency } }) => {
   return {
     currency,
   };
@@ -219,6 +228,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
     removeOption: (id) => dispatch(removeFromCart(id)),
+    removeItem: (id) => dispatch(removeItemFromCart(id)),
   };
 };
 

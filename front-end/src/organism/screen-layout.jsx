@@ -4,13 +4,16 @@ import { connect } from "react-redux";
 
 import NavBar from "../molecules/nav-bar";
 import { Text } from "../styles/style-guide";
-import { closeMiniCart } from "../reducers/is-added-to-cart-reducer";
+import {
+  closeCurrencyTray,
+  closeMiniCart,
+} from "../reducers/is-added-to-cart-reducer";
 
 const MainWrapper = styled.main`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   .title {
     margin: 0 auto;
     width: 90%;
@@ -69,6 +72,7 @@ class ScreenLayout extends Component {
       navId,
       overflow,
       link,
+      heading,
     } = this.props;
 
     return (
@@ -80,9 +84,9 @@ class ScreenLayout extends Component {
           setShow={this.setState}
         />
         {link && (
-          <div className="title">
+          <div className="title" onClick={() => this.props.hideCurrency()}>
             <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
-              {link.toUpperCase()}
+              {heading ? heading : heading === null ? null : link.toUpperCase()}
             </Text>
           </div>
         )}
@@ -98,11 +102,8 @@ class ScreenLayout extends Component {
             pb={pb}
             overflow={overflow}
             onClick={() => {
-              this.props.toggle(false);
-              // this.setState((state) => ({
-              //   ...this.state,
-              //   show: false,
-              // }));
+              this.props.toggle();
+              this.props.hideCurrency();
             }}
           >
             <div className={overlay ? "overlay" : ""}></div>
@@ -113,16 +114,20 @@ class ScreenLayout extends Component {
     );
   }
 }
-const mapStateToProps = ({ isAddedToCart, navlinks: { link } }) => {
+const mapStateToProps = ({
+  isAddedToCart: { overLay },
+  navlinks: { link },
+}) => {
   return {
-    overlay: isAddedToCart,
+    overlay: overLay,
     link,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    toggle: (value) => dispatch(closeMiniCart(value)),
+    toggle: () => dispatch(closeMiniCart()),
+    hideCurrency: () => dispatch(closeCurrencyTray()),
   };
 };
 

@@ -11,18 +11,13 @@ import CartItems from "../molecules/cart-page-item";
 import { priceFilter } from "../util/helper-function";
 
 const CartWrapper = styled.div`
-  height: 100%;
-  overflow: hidden;
   margin: 55px 0;
-  &,
   .cart-items {
     display: flex;
     flex-direction: column;
-    overflow: auto;
   }
 
   .total {
-    height: 50%;
     display: grid;
     grid-template-columns: 279px 1fr;
     padding-top: 32px;
@@ -48,7 +43,6 @@ class CartPage extends Component {
         size={32}
         fw="strong"
         navigate={this.props.history}
-        overflow="hidden"
       >
         <CartWrapper>
           <div className="cart-items">
@@ -69,12 +63,13 @@ class CartPage extends Component {
                 </Text>
                 <Text fw="strong" size={24} lh={28}>
                   {currency}
-                  {(
-                    (21 / 100) *
-                    cartItems.reduce((a, b) => {
-                      return a + priceFilter(b, currency) * b.quantity;
-                    }, 0)
-                  ).toFixed(2)}
+                  {currency &&
+                    (
+                      (21 / 100) *
+                      cartItems.reduce((a, b) => {
+                        return a + priceFilter(b, currency) * b.quantity;
+                      }, 0)
+                    ).toFixed(2)}
                 </Text>
               </div>
               <div className="amount">
@@ -93,7 +88,7 @@ class CartPage extends Component {
                 </Text>
                 <Text fw="strong" size={24} lh={28}>
                   {currency}{" "}
-                  {cartItems.length !== 0
+                  {cartItems.length !== 0 && currency
                     ? cartItems
                         .reduce((a, b) => {
                           return a + priceFilter(b, currency) * b.quantity;
@@ -111,7 +106,7 @@ class CartPage extends Component {
   }
 }
 
-const mapStateToProps = ({ cartItems, currency }) => {
+const mapStateToProps = ({ cartItems, allCurrency: { currency } }) => {
   return {
     cartItems,
     currency,
