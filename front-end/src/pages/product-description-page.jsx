@@ -16,26 +16,8 @@ import { addToCart } from "../reducers/cart-items-reducer";
 import Server from "../query/client";
 import { SINGLE_PRODUCT } from "../query/queries";
 export const PdpContainer = styled.div`
-  height: 100%;
   display: grid;
   grid-template-columns: 0.3fr 1.5fr;
-
-  ${({ inStock }) =>
-    inStock &&
-    css`
-      position: relative;
-      opacity: 0.3;
-      pointer-events: none;
-      .not-in-stock {
-        position: absolute;
-        color: ${colors["grey_2"]};
-        left: 50%;
-        transform: translate(-50%, 0);
-        top: 40%;
-        font-size: 32px;
-        line-height: 38.4px;
-      }
-    `}
 
   .small-img {
     display: flex;
@@ -65,6 +47,23 @@ export const PdpContainer = styled.div`
         height: 100%;
         object-fit: contain;
       }
+      ${({ inStock }) =>
+        inStock &&
+        css`
+          height: 100%;
+          position: relative;
+          opacity: 0.3;
+          pointer-events: none;
+          .not-in-stock {
+            position: absolute;
+            color: ${colors["grey_2"]};
+            left: 50%;
+            transform: translate(-50%, 0);
+            top: 40%;
+            font-size: 32px;
+            line-height: 38.4px;
+          }
+        `}
     }
     .item-details {
       display: flex;
@@ -141,9 +140,6 @@ class ProductDescriptionPage extends Component {
       >
         {
           <PdpContainer inStock={!product.inStock}>
-            {!product.inStock && (
-              <div className="not-in-stock">OUT OF STOCK</div>
-            )}
             <div className="small-img">
               {product.gallery.map((img, i) => (
                 <div
@@ -158,6 +154,9 @@ class ProductDescriptionPage extends Component {
             <div className="item-detail">
               <div className="big-img">
                 <img src={product.gallery[imgIndex]} alt={product.name} />
+                {!product.inStock && (
+                  <div className="not-in-stock">OUT OF STOCK</div>
+                )}
               </div>
               <div className="item-details">
                 <Text size={30} mb={16} fw="bold" lh={27}>
@@ -267,6 +266,7 @@ class ProductDescriptionPage extends Component {
                     priceFilter(product, this.props.currency)}
                 </Text>
                 <Button
+                  disabled={!product.inStock && true}
                   title="Add to Cart"
                   pt={16}
                   pb={16}

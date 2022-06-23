@@ -221,9 +221,7 @@ class NavBar extends Component {
                 }}
               />
               {cartItems.length !== 0 && (
-                <div className="item-count">
-                  {cartItems.reduce((a, b) => a + b.quantity, 0)}
-                </div>
+                <div className="item-count">{cartItems.length}</div>
               )}
             </div>
           </div>
@@ -251,10 +249,7 @@ class NavBar extends Component {
               <Text fw="bold">
                 My Bag,{" "}
                 <Text fw="medium" inline>
-                  {cartItems.length !== 0
-                    ? cartItems.reduce((a, b) => a + b.quantity, 0)
-                    : 0}{" "}
-                  items
+                  {cartItems.length !== 0 ? cartItems.length : 0} items
                 </Text>
               </Text>
             </div>

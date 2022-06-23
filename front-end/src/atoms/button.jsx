@@ -21,6 +21,7 @@ const StyledButton = styled.button`
   outline: none;
   font-size: ${({ fs }) => fs || 14}px;
   font-weight: 600;
+
   ${({ outline }) =>
     outline &&
     css`
@@ -28,12 +29,32 @@ const StyledButton = styled.button`
       color: ${colors["black"]};
       border: 1px solid ${colors["black"]};
     `}
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      cursor: not-allowed;
+      background: ${colors["grey"]};
+    `}
 `;
 
 class Button extends Component {
   render() {
-    const { outline, title, onClick, mr, ml, mt, mb, pr, pl, pt, pb, fs } =
-      this.props;
+    const {
+      outline,
+      title,
+      onClick,
+      mr,
+      ml,
+      mt,
+      mb,
+      pr,
+      pl,
+      pt,
+      pb,
+      fs,
+      disabled,
+    } = this.props;
     return (
       <StyledButton
         fs={fs}
@@ -47,6 +68,7 @@ class Button extends Component {
         pb={pb}
         outline={outline}
         onClick={onClick}
+        disabled={disabled}
       >
         {title}
       </StyledButton>
