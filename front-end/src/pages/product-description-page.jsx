@@ -133,11 +133,7 @@ class ProductDescriptionPage extends Component {
     }
 
     return (
-      <ScreenLayout
-        navigate={this.props.history}
-        heading={null}
-        overflow={!product.inStock ? "hidden" : "auto"}
-      >
+      <ScreenLayout navigate={this.props.history} heading={null}>
         {
           <PdpContainer inStock={!product.inStock}>
             <div className="small-img">

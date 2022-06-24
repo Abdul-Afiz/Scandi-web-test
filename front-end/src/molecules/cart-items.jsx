@@ -12,6 +12,7 @@ import {
 } from "../util/helper-function";
 import { connect } from "react-redux";
 import {
+  addQuantity,
   addToCart,
   removeFromCart,
   removeItemFromCart,
@@ -195,7 +196,9 @@ class CartItem extends Component {
 
         <div className="item-calcs">
           <div className="item-calc">
-            <AddIcon onClick={() => this.props.addOption({ ...this.state })} />
+            <AddIcon
+              onClick={() => this.props.increaseQuantity({ ...this.state })}
+            />
             <Text size={24} fw="medium" lh={38.4}>
               {cartItem.quantity}
             </Text>
@@ -227,6 +230,7 @@ const mapStateToProps = ({ allCurrency: { currency } }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
+    increaseQuantity: (item) => dispatch(addQuantity(item)),
     removeOption: (id) => dispatch(removeFromCart(id)),
     removeItem: (id) => dispatch(removeItemFromCart(id)),
   };

@@ -17,7 +17,7 @@ export const setDefaultAtrributes = (product) => {
 export const setCartMiniDefaultAtrributes = (product) => {
   const { attributes, selectedOption } = product;
   return attributes.reduce((acc, { name, items }) => {
-    const selectAttr = selectedOption[selectedOption.length - 1];
+    const selectAttr = selectedOption;
     const selectName = selectAttr[name];
     const item = items.find((item) => item.value === selectName.value);
     acc[name] = item;
@@ -27,7 +27,7 @@ export const setCartMiniDefaultAtrributes = (product) => {
 
 export const findOption = (cart) => {
   const item = cart.attributes.map(({ id, items }) => {
-    const selectArr = cart.selectedOption[cart.selectedOption.length - 1];
+    const selectArr = cart.selectedOption;
     const findItem = items.find((item) => item.value === selectArr[id].value);
     return findItem.value;
   });

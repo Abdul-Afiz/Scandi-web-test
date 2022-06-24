@@ -13,7 +13,7 @@ const MainWrapper = styled.main`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: auto;
+  overflow: hidden;
   .title {
     margin: 0 auto;
     width: 90%;
@@ -37,10 +37,15 @@ const Main = styled.div`
     position: fixed;
     background: #39374838;
     transition: background 0.5s;
+    cursor: not-allowed;
     top: 0;
     bottom: 0;
     right: 0;
     left: 0;
+  }
+
+  .pages {
+    pointer-events: none;
   }
 `;
 
@@ -100,14 +105,14 @@ class ScreenLayout extends Component {
             pl={pl}
             pt={pt}
             pb={pb}
-            overflow={overflow}
+            overflow={overlay ? "hidden" : overflow ? overflow : ""}
             onClick={() => {
               this.props.toggle();
               this.props.hideCurrency();
             }}
           >
             <div className={overlay ? "overlay" : ""}></div>
-            {children}
+            <div className={overlay ? "pages" : ""}>{children}</div>
           </Main>
         )}
       </MainWrapper>

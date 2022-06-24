@@ -278,10 +278,12 @@ class CartItem extends Component {
               src={cartItem.gallery[this.state.imgIndex]}
               alt={cartItem.name}
             />
-            <div className="img-nav">
-              <PrevIcon onClick={() => this.prevImg()} />
-              <NextIcon onClick={() => this.nextImg()} />
-            </div>
+            {cartItem.gallery.length > 1 && (
+              <div className="img-nav">
+                <PrevIcon onClick={() => this.prevImg()} />
+                <NextIcon onClick={() => this.nextImg()} />
+              </div>
+            )}
           </div>
         </div>
       </ItemsWrapper>

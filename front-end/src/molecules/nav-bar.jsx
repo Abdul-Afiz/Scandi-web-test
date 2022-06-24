@@ -32,14 +32,14 @@ const Nav = styled.nav`
     align-items: center;
   }
   .cart-drawer {
-    display: flex;
     overflow: hidden;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     position: absolute;
-    background-color: #ffffff;
+    background-color: #fff;
     max-width: 325px;
-    max-height: 677px;
-    top: ${({ overlay }) => (overlay ? "5rem" : "-50rem")};
+    max-height: calc(100vh - 80px);
+    top: ${({ overlay }) => (overlay ? "5rem" : "-100vh")};
     transition: top 0.7s;
     right: calc(6% - 2rem);
     padding: 32px 16px;
@@ -60,6 +60,10 @@ const Nav = styled.nav`
       justify-content: space-between;
       align-items: center;
       margin-bottom: 34px;
+    }
+    .details {
+      height: 100%;
+      overflow: auto;
     }
   }
 
@@ -138,12 +142,29 @@ class NavBar extends Component {
       const { currencies, categories } = await Server.post(
         new CombinedField().add(ALL_CATEGORY_QUERY).add(CURRENCY_QUERY)
       );
+
+      //fetch currencies from B.E and assign to a state and also map out to show on the navbar as currencies dropdown
       this.props.setCurrencies(currencies);
+
+      //assigning the first currency symbol in the currencies array from B.E as the current currency symbol.
       this.props.setCurrency(currencies[0].symbol);
-      const id = this.props.navId ? this.props.navId : "all";
+
+      // this is the id from the router params (match.params.id)
+      const id = this.props.navId;
+
+      //fetch categories from B.E and assign to a state and also map out to show on the navbar as navlinks
       this.props.setCategory(categories);
-      const currentLink = categories.find(({ name }) => name === id).name;
+
+      //checking the categories data to see if it matches params id
+      const link = categories.map(({ name }) => (name === id ? name : ""));
+
+      //if categories data matches id, it returns the id else it assign the first data name in the categories array from B.E as the current link.
+      const currentLink = link.includes(id) ? id : categories[0].name;
+
+      //i'm using this currentLink variable to change my category from B.E
       this.props.changeCategory(currentLink);
+
+      //if the currencies data is fetched from the BE, it should load the pages
       currencies &&
         this.props.setShow((state) => ({
           ...state,
@@ -253,25 +274,27 @@ class NavBar extends Component {
                 </Text>
               </Text>
             </div>
-            <div className="cart-wrapper">
-              {cartItems.map((item) => (
-                <CartItem key={`cart_key_${item.id}`} cartItem={item} />
-              ))}
-            </div>
-            <div className="total">
-              <Text fw="medium" lh={18}>
-                Total
-              </Text>
-              <Text fw="strong">
-                {currency}
-                {cartItems.length !== 0
-                  ? cartItems
-                      .reduce((a, b) => {
-                        return a + priceFilter(b, currency) * b.quantity;
-                      }, 0)
-                      .toFixed(2)
-                  : 0}
-              </Text>
+            <div className="details">
+              <div className="cart-wrapper">
+                {cartItems.map((item) => (
+                  <CartItem key={`cart_key_${item.id}`} cartItem={item} />
+                ))}
+              </div>
+              <div className="total">
+                <Text fw="medium" lh={18}>
+                  Total
+                </Text>
+                <Text fw="strong">
+                  {currency}
+                  {cartItems.length !== 0
+                    ? cartItems
+                        .reduce((a, b) => {
+                          return a + priceFilter(b, currency) * b.quantity;
+                        }, 0)
+                        .toFixed(2)
+                    : 0}
+                </Text>
+              </div>
             </div>
             <div className="btn">
               <Button

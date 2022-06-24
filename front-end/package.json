@@ -3,13 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.6.8",
     "@reduxjs/toolkit": "^1.8.2",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
     "@tilework/opus": "^0.0.10",
-    "graphql": "^16.5.0",
     "html-react-parser": "^2.0.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -18,6 +16,8 @@
     "react-scripts": "5.0.1",
     "redux": "^4.2.0",
     "styled-components": "^5.3.5",
+    "symbol-observable": "^4.0.0",
+    "uuid": "^8.3.2",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
@@ -44,8 +44,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "apollo-boost": "^0.4.9",
-    "react-apollo": "^3.1.5"
-  }
+  "devDependencies": {}
 }

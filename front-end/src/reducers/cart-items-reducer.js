@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { v4 as uuidv4 } from "uuid";
 
 const cartItemsSlice = createSlice({
   name: "cartItems",
@@ -6,25 +7,41 @@ const cartItemsSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const product = action.payload;
-      const findProduct = state.find((item) => item.id === product.id);
-
+      const findProduct = state.find(
+        (item) => item.productId === product.productId
+      );
       if (findProduct) {
         const existingProduct = {
           ...findProduct,
-          selectedOption: findProduct.selectedOption.concat(
-            product.selectedOption
-          ),
+          selectedOption: product.selectedOption,
           quantity: findProduct.quantity + 1,
         };
         return state.map((item) =>
-          item.id === findProduct.id ? existingProduct : item
+          item.productId === findProduct.productId ? existingProduct : item
         );
       } else {
         state.push({
           ...product,
-          selectedOption: [product.selectedOption],
+          productId: uuidv4(),
+          selectedOption: product.selectedOption,
           quantity: product.quantity + 1,
         });
+      }
+    },
+
+    addQuantity(state, action) {
+      const product = action.payload;
+      const findProduct = state.find(
+        (item) => item.productId === product.productId
+      );
+      if (findProduct) {
+        const existingProduct = {
+          ...findProduct,
+          quantity: findProduct.quantity + 1,
+        };
+        return state.map((item) =>
+          item.productId === findProduct.productId ? existingProduct : item
+        );
       }
     },
 
@@ -54,6 +71,6 @@ const cartItemsSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, removeItemFromCart } =
+export const { addToCart, addQuantity, removeFromCart, removeItemFromCart } =
   cartItemsSlice.actions;
 export default cartItemsSlice.reducer;
