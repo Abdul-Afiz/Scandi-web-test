@@ -277,7 +277,10 @@ class NavBar extends Component {
             <div className="details">
               <div className="cart-wrapper">
                 {cartItems.map((item) => (
-                  <CartItem key={`cart_key_${item.id}`} cartItem={item} />
+                  <CartItem
+                    key={`cart_key_${item.productId}`}
+                    cartItem={item}
+                  />
                 ))}
               </div>
               <div className="total">

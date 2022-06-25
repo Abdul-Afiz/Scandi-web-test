@@ -12,8 +12,9 @@ import {
 } from "../util/helper-function";
 import { connect } from "react-redux";
 import {
+  addQuantity,
   addToCart,
-  removeFromCart,
+  deductQuantity,
   removeItemFromCart,
 } from "../reducers/cart-items-reducer";
 import PrevIcon from "../vectors/prev-svg";
@@ -91,7 +92,7 @@ class CartItem extends Component {
     this.state = {
       imgIndex: 0,
       product: {
-        id: "",
+        productId: "",
         selectedOption: {},
         quantity: 0,
       },
@@ -131,7 +132,7 @@ class CartItem extends Component {
     this.setState((state) => ({
       ...state,
       product: {
-        id: this.props.cartItem.id,
+        productId: this.props.cartItem.productId,
         selectedOption: setCartMiniDefaultAtrributes(this.props.cartItem),
         quantity: this.props.cartItem.quantity,
       },
@@ -258,17 +259,19 @@ class CartItem extends Component {
         <div className="item-calcs">
           <div className="item-calc">
             <AddIcon
-              onClick={() => this.props.addOption({ ...this.state.product })}
+              onClick={() => {
+                this.props.increaseQuantity({ ...this.state.product });
+              }}
             />
             <Text size={24} fw="medium" lh={38.4}>
               {cartItem.quantity}
             </Text>
             <RemoveIcon
               onClick={() =>
-                cartItem.selectedOption.length <= 1
-                  ? this.props.removeItem(this.state.product.id)
-                  : cartItem.selectedOption.length >= 1
-                  ? this.props.removeOption(this.state.product.id)
+                cartItem.quantity <= 1
+                  ? this.props.removeItem(this.state.product.productId)
+                  : cartItem.quantity >= 1
+                  ? this.props.removeOption(this.state.product.productId)
                   : -1
               }
             />
@@ -300,7 +303,8 @@ const mapStateToProps = ({ allCurrency: { currency } }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
-    removeOption: (id) => dispatch(removeFromCart(id)),
+    increaseQuantity: (item) => dispatch(addQuantity(item)),
+    removeOption: (id) => dispatch(deductQuantity(id)),
     removeItem: (id) => dispatch(removeItemFromCart(id)),
   };
 };

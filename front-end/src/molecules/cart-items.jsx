@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 import {
   addQuantity,
   addToCart,
-  removeFromCart,
+  deductQuantity,
   removeItemFromCart,
 } from "../reducers/cart-items-reducer";
 
@@ -74,7 +74,7 @@ class CartItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: "",
+      productId: "",
       selectedOption: {},
       quantity: 0,
     };
@@ -91,7 +91,7 @@ class CartItem extends Component {
 
   componentDidMount() {
     this.setState(() => ({
-      id: this.props.cartItem.id,
+      productId: this.props.cartItem.productId,
       selectedOption: setCartMiniDefaultAtrributes(this.props.cartItem),
       quantity: this.props.cartItem.quantity,
     }));
@@ -182,7 +182,9 @@ class CartItem extends Component {
                                   : findOption(cartItem).includes(item.value)
                               }
                               value={item.value}
-                              onClick={() => this.addNewOption(name, item)}
+                              onClick={() => {
+                                this.addNewOption(name, item);
+                              }}
                             />
                           );
                         })}
@@ -204,10 +206,10 @@ class CartItem extends Component {
             </Text>
             <RemoveIcon
               onClick={() =>
-                cartItem.selectedOption.length <= 1
-                  ? this.props.removeItem(this.state.id)
-                  : cartItem.selectedOption.length >= 1
-                  ? this.props.removeOption(this.state.id)
+                cartItem.quantity <= 1
+                  ? this.props.removeItem(this.state.productId)
+                  : cartItem.quantity >= 1
+                  ? this.props.removeOption(this.state.productId)
                   : -1
               }
             />
@@ -231,7 +233,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
     increaseQuantity: (item) => dispatch(addQuantity(item)),
-    removeOption: (id) => dispatch(removeFromCart(id)),
+    removeOption: (id) => dispatch(deductQuantity(id)),
     removeItem: (id) => dispatch(removeItemFromCart(id)),
   };
 };

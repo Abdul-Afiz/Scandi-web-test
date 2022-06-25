@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { v4 as uuidv4 } from "uuid";
+import { verifyProduct } from "../util/helper-function";
 
 const cartItemsSlice = createSlice({
   name: "cartItems",
@@ -7,18 +8,9 @@ const cartItemsSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const product = action.payload;
-      const findProduct = state.find(
-        (item) => item.productId === product.productId
-      );
-      if (findProduct) {
-        const existingProduct = {
-          ...findProduct,
-          selectedOption: product.selectedOption,
-          quantity: findProduct.quantity + 1,
-        };
-        return state.map((item) =>
-          item.productId === findProduct.productId ? existingProduct : item
-        );
+      const checkAttr = verifyProduct(state, product.selectedOption);
+      if (checkAttr) {
+        return;
       } else {
         state.push({
           ...product,
@@ -45,32 +37,31 @@ const cartItemsSlice = createSlice({
       }
     },
 
-    removeFromCart(state, action) {
+    deductQuantity(state, action) {
       const id = action.payload;
-      const findItem = state.find((product) => product.id === id);
+      console.log({ id });
+      const findItem = state.find((product) => product.productId === id);
 
       if (findItem) {
         const modifiedItem = {
           ...findItem,
-          selectedOption: findItem.selectedOption.filter(
-            (attr, i, arr) => i !== arr.length - 1
-          ),
           quantity: findItem.quantity === 0 ? 0 : findItem.quantity - 1,
         };
-        return state.map((item) => (item.id === id ? modifiedItem : item));
+        return state.map((item) =>
+          item.productId === id ? modifiedItem : item
+        );
       }
     },
     removeItemFromCart(state, action) {
       const id = action.payload;
-      const findItem = state.find((product) => product.id === id);
-
+      const findItem = state.find((product) => product.productId === id);
       if (findItem) {
-        return state.filter((item) => item.id !== id);
+        return state.filter((item) => item.productId !== id);
       }
     },
   },
 });
 
-export const { addToCart, addQuantity, removeFromCart, removeItemFromCart } =
+export const { addToCart, addQuantity, deductQuantity, removeItemFromCart } =
   cartItemsSlice.actions;
 export default cartItemsSlice.reducer;

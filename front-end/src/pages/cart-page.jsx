@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Text } from "../styles/style-guide";
 
 import Button from "../atoms/button";
-import { addToCart, removeFromCart } from "../reducers/cart-items-reducer";
+import { addToCart, deductQuantity } from "../reducers/cart-items-reducer";
 import CartItems from "../molecules/cart-page-item";
 import { priceFilter } from "../util/helper-function";
 
@@ -35,7 +35,6 @@ const CartWrapper = styled.div`
 class CartPage extends Component {
   render() {
     const { cartItems, currency } = this.props;
-
     return (
       <ScreenLayout
         mb={55}
@@ -48,7 +47,7 @@ class CartPage extends Component {
           <div className="cart-items">
             {cartItems.map((item, i) => (
               <CartItems
-                key={item.id}
+                key={item.productId}
                 cartItem={item}
                 blackborder={i === 0 && true}
               />
@@ -116,7 +115,7 @@ const mapStateToProps = ({ cartItems, allCurrency: { currency } }) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     addOption: (item) => dispatch(addToCart(item)),
-    removeOption: (id) => dispatch(removeFromCart(id)),
+    removeOption: (id) => dispatch(deductQuantity(id)),
   };
 };
 
