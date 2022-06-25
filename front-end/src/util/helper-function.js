@@ -1,13 +1,5 @@
 import { current } from "@reduxjs/toolkit";
 
-export const splitTitle = (data) => {
-  let splitData = data.split(" ");
-  return {
-    head: splitData[0],
-    tail: splitData.slice(1).join(" "),
-  };
-};
-
 export const setDefaultAtrributes = (product) => {
   const { attributes } = product;
   return attributes.reduce((acc, { name, items }) => {
@@ -28,13 +20,17 @@ export const setCartMiniDefaultAtrributes = (product) => {
 };
 
 export const findOption = (cart) => {
+  //checking inside the cart to return vslue thst corresponds to selectedOption in the same product
   const item = cart.attributes.map(({ id, items }) => {
     const selectArr = cart.selectedOption;
+
+    //accessing the object value by the id of the attribute if it exists
     const findItem = items.find((item) => item.value === selectArr[id].value);
     return findItem.value;
   });
   return item;
 };
+
 export const isProductSelectionInCart = (checkList, selectedOption) => {
   const optionArr = Object.entries(selectedOption).map((optionValue) => [
     optionValue[0],
@@ -48,35 +44,33 @@ export const isProductSelectionInCart = (checkList, selectedOption) => {
   });
 };
 
-export const verifyOption = (cart, newCart) => {
-  if (cart === undefined) return false;
-  const { selectedOption } = cart;
-  return Object.entries(selectedOption).every((item) => {
-    const verifyItem = newCart[item[0]].value === item[1].value;
-    return verifyItem;
-  });
-};
-
 export const verifyProduct = (store, newCart) => {
   // if store => cartItemReduxStore (arr) is empty return false;
   if (store.length === 0) return;
 
-  //filter item if in cart
+  // Check if an item is existing in a cart
   const itemAvailableInCart = current(store).filter(
     (item) => item.id === newCart.id
   );
 
+  // if there there si no item in cart it returns false
   if (!itemAvailableInCart.length) return false;
 
+  // selecting selectedOption from the new product to be added
   const optionsToTest = newCart.selectedOption;
 
+  // checking if the item exists in the filteredArray
   const itemInCart = itemAvailableInCart.find((item) => {
+    //converting the object to an arr
     const selectedOptionArr = Object.entries(item.selectedOption);
+
+    //modifying the new array of selectedOption to return only the id and value
     const checkList = selectedOptionArr.map((optionValue) => [
       optionValue[0],
       optionValue[1].id,
     ]);
 
+    //using this function to verify if the ids and value of product is same using a function
     const result = isProductSelectionInCart(checkList, optionsToTest);
 
     return result;
@@ -84,19 +78,6 @@ export const verifyProduct = (store, newCart) => {
 
   if (itemInCart === undefined) return false;
   return true;
-  // using reduce to check the whole store, if a product has an existing selectedOption, if it has it will return true else false
-
-  // const checkStore = current(store).reduce((acc, { selectedOption }) => {
-  //   // inside the reduce, i convert the selectedOption obj to an array, checking if the first selectedOption exist in the new added product selected product option
-
-  //   acc = Object.entries(selectedOption).every((item) => {
-  //     if (!newCart.hasOwnProperty(item[0])) return false;
-  //     const verifyItem = newCart[item[0]].value === item[1].value;
-  //     return verifyItem;
-  //   });
-  //   return acc;
-  // }, null);
-  // return checkStore;
 };
 
 //this function will receive the a product and filters the price of a product which is the same as the current currency selected in the navbar using filter method

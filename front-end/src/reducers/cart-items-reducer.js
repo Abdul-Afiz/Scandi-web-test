@@ -39,7 +39,7 @@ const cartItemsSlice = createSlice({
 
     deductQuantity(state, action) {
       const id = action.payload;
-      console.log({ id });
+
       const findItem = state.find((product) => product.productId === id);
 
       if (findItem) {
