@@ -8,7 +8,7 @@ const cartItemsSlice = createSlice({
   reducers: {
     addToCart(state, action) {
       const product = action.payload;
-      const checkAttr = verifyProduct(state, product.selectedOption);
+      const checkAttr = verifyProduct(state, product);
       if (checkAttr) {
         return;
       } else {

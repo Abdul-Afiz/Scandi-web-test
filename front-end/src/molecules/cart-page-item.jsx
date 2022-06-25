@@ -169,7 +169,6 @@ class CartItem extends Component {
                         <div className="size">
                           {items.map((item) => (
                             <ColorBox
-                              onClick={() => this.addNewOption(name, item)}
                               key={item.id}
                               selected={
                                 this.state.product.selectedOption.hasOwnProperty(
@@ -195,7 +194,6 @@ class CartItem extends Component {
                       <div className="size">
                         {items.map((item) => (
                           <SizeBox
-                            onClick={() => this.addNewOption(name, item)}
                             key={item.value}
                             selected={
                               this.state.product.selectedOption.hasOwnProperty(
@@ -239,7 +237,6 @@ class CartItem extends Component {
                                   : findOption(cartItem).includes(item.value)
                               }
                               value={item.value}
-                              onClick={() => this.addNewOption(name, item)}
                               pt={12}
                               pb={12}
                               pr={28}
