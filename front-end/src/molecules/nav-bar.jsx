@@ -156,10 +156,10 @@ class NavBar extends Component {
       this.props.setCategory(categories);
 
       //checking the categories data to see if it matches params id
-      const link = categories.map(({ name }) => (name === id ? name : ""));
+      const links = categories.map(({ name }) => (name === id ? name : ""));
 
       //if categories data matches id, it returns the id else it assign the first data name in the categories array from B.E as the current link.
-      const currentLink = link.includes(id) ? id : categories[0].name;
+      const currentLink = links.includes(id) ? id : categories[0].name;
 
       //i'm using this currentLink variable to change my category from B.E
       this.props.changeCategory(currentLink);
@@ -218,11 +218,7 @@ class NavBar extends Component {
               </Text>
             ))}
           </div>
-          <img
-            src="/a-logo.png"
-            alt="logo"
-            onClick={() => this.props.navigate.push("/")}
-          />
+          <img src="/a-logo.png" alt="logo" />
           <div className="icon">
             <div
               onClick={() => {

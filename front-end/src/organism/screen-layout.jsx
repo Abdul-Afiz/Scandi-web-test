@@ -10,10 +10,13 @@ import {
 } from "../reducers/is-added-to-cart-reducer";
 
 const MainWrapper = styled.main`
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  overflow: auto;
+  .layout-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: auto;
+  }
   .title {
     margin: 0 auto;
     width: 90%;
@@ -32,7 +35,7 @@ const Main = styled.div`
   padding-left: ${({ pl }) => `${pl}px`};
   padding-top: ${({ pt }) => `${pt}px`};
   padding-bottom: ${({ pb }) => `${pb || 16}px`};
-  overflow: ${({ overflow }) => (overflow ? overflow : "auto")};
+  overflow: ${({ overflow }) => overflow};
   .overlay {
     position: fixed;
     background: #39374838;
@@ -88,33 +91,39 @@ class ScreenLayout extends Component {
           show={this.state.show}
           setShow={this.setState}
         />
-        {link && (
-          <div className="title" onClick={() => this.props.hideCurrency()}>
-            <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
-              {heading ? heading : heading === null ? null : link.toUpperCase()}
-            </Text>
-          </div>
-        )}
-        {this.state.show && (
-          <Main
-            mr={mr}
-            ml={ml}
-            mt={mt}
-            mb={mb}
-            pr={pr}
-            pl={pl}
-            pt={pt}
-            pb={pb}
-            overflow={overlay ? "hidden" : overflow ? overflow : ""}
-            onClick={() => {
-              this.props.toggle();
-              this.props.hideCurrency();
-            }}
-          >
-            <div className={overlay ? "overlay" : ""}></div>
-            <div className={overlay ? "pages" : ""}>{children}</div>
-          </Main>
-        )}
+        <div className="layout-container">
+          {link && (
+            <div className="title" onClick={() => this.props.hideCurrency()}>
+              <Text mt={ht ? ht : 80} mb={hb ? hb : 0} fw={fw} size={size}>
+                {heading
+                  ? heading
+                  : heading === null
+                  ? null
+                  : link.toUpperCase()}
+              </Text>
+            </div>
+          )}
+          {this.state.show && (
+            <Main
+              mr={mr}
+              ml={ml}
+              mt={mt}
+              mb={mb}
+              pr={pr}
+              pl={pl}
+              pt={pt}
+              pb={pb}
+              overflow={overlay ? "hidden" : overflow ? overflow : ""}
+              onClick={() => {
+                this.props.toggle();
+                this.props.hideCurrency();
+              }}
+            >
+              <div className={overlay ? "overlay" : ""}></div>
+              <div className={overlay ? "pages" : ""}>{children}</div>
+            </Main>
+          )}
+        </div>
       </MainWrapper>
     );
   }

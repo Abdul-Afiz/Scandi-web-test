@@ -24,7 +24,9 @@ class CategoryPage extends Component {
     };
   }
   async componentDidMount() {
-    const id = this.props.match.params.id ? this.props.match.params.id : "all";
+    const id = this.props.match.params.id
+      ? this.props.match.params.id
+      : this.props.link;
     try {
       const { category } = await Server.post(SINGLE_CATEGORY_QUERY(id));
       this.props.fetchProduct(category.products);
@@ -82,7 +84,7 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-const mapStateToProps = ({ products, navlinks: { link } }) => {
+const mapStateToProps = ({ products, navlinks: { link, links } }) => {
   return {
     products,
     link,
